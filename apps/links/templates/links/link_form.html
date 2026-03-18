@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Add Link | CoopLink{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <div class="badge badge-primary badge-outline mb-3">New link</div>
+                    <h1 class="card-title text-2xl">Save a link</h1>
+                    <p class="text-base-content/70">Add a title, URL, and optional notes so you can find it later.</p>
+                </div>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                {% include "includes/forms/input_field.html" with field_id="id_title" field_name="title" label="Title" input_type="text" placeholder="Example: Weekly design inspiration" value=form.title.value errors=form.title.errors %}
+
+                {% include "includes/forms/input_field.html" with field_id="id_url" field_name="url" label="URL" input_type="url" placeholder="https://example.com" value=form.url.value errors=form.url.errors %}
+
+                {% include "includes/forms/textarea_field.html" with field_id="id_description" field_name="description" label="Description" placeholder="Write a short note about this link" rows="4" value=form.description.value errors=form.description.errors %}
+
+                {% include "includes/forms/select_field.html" with field_id="id_category" field_name="category" label="Category (optional)" empty_option_label="No category" options=form.category.field.queryset selected_value=form.category.value help_text="Leave this blank if you do not want to choose a category yet." errors=form.category.errors %}
+
+                <div class="card-actions justify-end">
+                    <a href="{% url 'links:dashboard' %}" class="btn btn-ghost">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

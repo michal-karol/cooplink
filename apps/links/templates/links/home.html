@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}CoopLink{% endblock %}
+
+{% block content %}
+<section class="hero rounded-3xl bg-base-100 shadow-xl border border-base-200 overflow-hidden">
+    <div class="hero-content py-16 lg:py-24 grid lg:grid-cols-2 gap-10">
+        <div>
+            <span class="badge badge-primary badge-outline mb-4">Personal link library</span>
+            <h1 class="text-5xl lg:text-6xl font-bold leading-tight">Save your useful links in one place</h1>
+            <p class="py-6 text-lg text-base-content/70">
+                Keep important resources organised, easy to find, and ready whenever you need them.
+            </p>
+            <div class="join join-vertical sm:join-horizontal">
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary join-item">Create account</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline join-item">Login</a>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div class="mockup-window border bg-base-200">
+                <div class="bg-base-100 px-6 py-8 space-y-4">
+                    <div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+                        <div class="stat">
+                            <div class="stat-title">Keep things tidy</div>
+                            <div class="stat-value text-primary text-2xl">Organise</div>
+                            <div class="stat-desc">Save useful links in one place</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-title">Find them later</div>
+                            <div class="stat-value text-secondary text-2xl">Revisit</div>
+                            <div class="stat-desc">Open what you need, when you need it</div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-base-100 border border-base-300">
+                        <div class="card-body">
+                            <div class="flex items-center justify-between">
+                                <h2 class="card-title text-lg">Design inspiration</h2>
+                                <div class="badge badge-outline">Creative</div>
+                            </div>
+                            <p class="text-sm text-base-content/70">https://example.com/inspiration</p>
+                            <p>A saved resource you can come back to when planning your next project.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
