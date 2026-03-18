@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Register | CoopLink{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-start">
+        <div class="hidden lg:block pt-10">
+            <span class="badge badge-primary badge-outline mb-4">Personal link library</span>
+            <h1 class="text-4xl font-bold leading-tight">Create your CoopLink account</h1>
+            <p class="py-4 text-base-content/70">
+                Save useful links, keep them organised, and come back to them whenever you need.
+            </p>
+
+            <div class="stats shadow bg-base-100">
+                <div class="stat">
+                    <div class="stat-title">All your links</div>
+                    <div class="stat-value text-primary text-2xl">One place</div>
+                    <div class="stat-desc">Organise and revisit what matters</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl border border-base-200 w-full max-w-md mx-auto">
+            <div class="card-body">
+                <h2 class="card-title text-2xl">Create an account</h2>
+                <p class="text-sm text-base-content/70">Join CoopLink and start building your personal link library.</p>
+
+                <div class="divider my-1"></div>
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">
+                            <span>{{ form.non_field_errors }}</span>
+                        </div>
+                    {% endif %}
+
+                    {% include "includes/forms/input_field.html" with field_id="id_username" field_name="username" label="Username" input_type="text" placeholder="Choose a username" autocomplete="username" value=form.username.value errors=form.username.errors %}
+
+                    {% include "includes/forms/input_field.html" with field_id="id_email" field_name="email" label="Email" input_type="email" placeholder="Email address" autocomplete="email" value=form.email.value errors=form.email.errors %}
+
+                    {% include "includes/forms/input_field.html" with field_id="id_password1" field_name="password1" label="Password" input_type="password" placeholder="Create a password" autocomplete="new-password" errors=form.password1.errors %}
+
+                    {% include "includes/forms/input_field.html" with field_id="id_password2" field_name="password2" label="Confirm password" input_type="password" placeholder="Confirm password" autocomplete="new-password" errors=form.password2.errors %}
+
+                    <button type="submit" class="btn btn-primary w-full">Register</button>
+                </form>
+
+                <div class="divider text-xs">OR</div>
+
+                <p class="text-sm text-center">
+                    Already have an account?
+                    <a href="{% url 'accounts:login' %}" class="link link-primary">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

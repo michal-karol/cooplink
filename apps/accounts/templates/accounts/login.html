@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login | CoopLink{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content w-full justify-center">
+        <div class="card bg-base-100 shadow-xl border border-base-200 w-full max-w-md">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <h1 class="card-title text-2xl">Log in</h1>
+                    <span class="badge badge-secondary badge-outline">Welcome back</span>
+                </div>
+
+                <p class="text-sm text-base-content/70">Enter your details to open your dashboard.</p>
+
+                <div class="divider my-1"></div>
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">
+                            <span>Invalid username or password.</span>
+                        </div>
+                    {% endif %}
+
+                    {% include "includes/forms/input_field.html" with field_id=form.username.id_for_label field_name="username" label="Username" input_type="text" placeholder="Enter your username" autocomplete="username" value=form.username.value errors=form.username.errors %}
+
+                    {% include "includes/forms/input_field.html" with field_id=form.password.id_for_label field_name="password" label="Password" input_type="password" placeholder="Enter your password" autocomplete="current-password" errors=form.password.errors %}
+
+                    <button type="submit" class="btn btn-primary w-full">Log in</button>
+                </form>
+
+                <div class="divider text-xs">NEW HERE?</div>
+
+                <p class="text-sm text-center">
+                    Need an account?
+                    <a href="{% url 'accounts:register' %}" class="link link-primary">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

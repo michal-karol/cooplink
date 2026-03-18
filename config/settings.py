@@ -127,3 +127,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# After login, redirect dashboard.
+LOGIN_REDIRECT_URL = "links:dashboard"
+# After logout, redirect to home page.
+LOGOUT_REDIRECT_URL = "links:home"
+# If a page needs login redirect to login
+LOGIN_URL = "accounts:login"

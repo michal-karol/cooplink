@@ -1,0 +1,25 @@
+<div>
+    <label class="label" for="{{ field_id }}">
+        <span class="label-text">{{ label }}</span>
+    </label>
+
+    <input
+        type="{{ input_type|default:'text' }}"
+        name="{{ field_name }}"
+        id="{{ field_id }}"
+        class="input input-bordered w-full"
+        {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+        {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+        {% if input_type != "password" %}value="{{ value|default:'' }}"{% endif %}
+    >
+
+    {% if help_text %}
+        <label class="label">
+            <span class="label-text-alt text-base-content/60">{{ help_text }}</span>
+        </label>
+    {% endif %}
+
+    {% for error in errors %}
+        <p class="text-sm text-error mt-1">{{ error }}</p>
+    {% endfor %}
+</div>
