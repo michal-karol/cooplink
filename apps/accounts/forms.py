@@ -25,3 +25,28 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email")
+
+    def clean_first_name(self):
+        # Remove spaces around the first name.
+        return self.cleaned_data["first_name"].strip()
+
+    def clean_last_name(self):
+        # Remove spaces around the last name.
+        return self.cleaned_data["last_name"].strip()
+
+    def clean_email(self):
+        # Let the current user keep their email, but block duplicates.
+        email = self.cleaned_data["email"].strip().lower()
+        if (
+            User.objects.filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise forms.ValidationError("An account with this email already exists.")
+        return email

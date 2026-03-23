@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Library | CoopLink{% endblock %}
+
+{% block content %}
+<div class="grid gap-6">
+    <section class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body gap-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <div class="badge badge-primary badge-outline mb-3">Your library</div>
+                    <h1 class="text-3xl font-bold">Saved links</h1>
+                    <p class="text-base-content/70">Browse, search, and organise the links you have saved.</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'links:categories' %}" class="btn btn-outline">Manage categories</a>
+                    <a href="{% url 'links:add_link' %}" class="btn btn-primary">Save new link</a>
+                </div>
+            </div>
+
+            <form method="get" class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_auto]">
+                <div>
+                    {% include "includes/forms/input_field.html" with field_id="id_q" field_name="q" label="Search" input_type="text" placeholder="Search by title or category" value=query errors="" %}
+                </div>
+
+                <div>
+                    {% include "includes/forms/select_field.html" with field_id="id_category" field_name="category" label="Category" empty_option_label="All categories" options=categories selected_value=selected_category errors="" %}
+                </div>
+
+                <div class="flex items-end gap-3">
+                    <input type="hidden" name="view" value="{{ view_mode }}">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="{% url 'links:library' %}" class="btn btn-ghost">Clear</a>
+                </div>
+            </form>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="badge badge-outline">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</div>
+
+                <div class="join">
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&view=cards"
+                        class="btn join-item {% if view_mode == 'cards' %}btn-primary{% else %}btn-outline{% endif %}"
+                    >
+                        Cards
+                    </a>
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&view=list"
+                        class="btn join-item {% if view_mode == 'list' %}btn-primary{% else %}btn-outline{% endif %}"
+                    >
+                        List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if page_obj.object_list %}
+        {% if view_mode == "cards" %}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for link in page_obj %}
+                    <article class="card bg-base-100 shadow border border-base-200 hover:shadow-lg transition-shadow">
+                        <div class="card-body">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <h2 class="card-title">{{ link.title }}</h2>
+                                    <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                                        {{ link.url }}
+                                    </a>
+                                </div>
+
+                                {% if link.category %}
+                                    <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
+                                {% else %}
+                                    <div class="badge badge-ghost">Uncategorised</div>
+                                {% endif %}
+                            </div>
+
+                            {% if link.description %}
+                                <p class="text-base-content/80">{{ link.description }}</p>
+                            {% endif %}
+
+                            <div class="card-actions justify-end">
+                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                                <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card bg-base-100 shadow border border-base-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>URL</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for link in page_obj %}
+                                <tr>
+                                    <td>{{ link.title }}</td>
+                                    <td>
+                                        {% if link.category %}
+                                            <span class="badge badge-secondary badge-outline">{{ link.category.name }}</span>
+                                        {% else %}
+                                            <span class="badge badge-ghost">Uncategorised</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                                            {{ link.url }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+                                            <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                                            <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="flex justify-center">
+            <div class="join">
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&view={{ view_mode }}&page={{ page_obj.previous_page_number }}"
+                        class="btn join-item"
+                    >
+                        Previous
+                    </a>
+                {% endif %}
+
+                <button class="btn join-item btn-disabled">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </button>
+
+                {% if page_obj.has_next %}
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&view={{ view_mode }}&page={{ page_obj.next_page_number }}"
+                        class="btn join-item"
+                    >
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card bg-base-100 shadow-xl border border-base-200">
+            <div class="card-body">
+                <div class="badge badge-outline mb-2 w-fit">No results</div>
+                <h2 class="card-title">No matching results found</h2>
+                <p class="text-base-content/70">
+                    Try a different search term, remove the category filter, or save a new link.
+                </p>
+                <div class="card-actions justify-end">
+                    <a href="{% url 'links:library' %}" class="btn btn-ghost">Clear filters</a>
+                    <a href="{% url 'links:add_link' %}" class="btn btn-primary">Save a link</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

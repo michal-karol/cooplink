@@ -3,6 +3,21 @@ from django import forms
 from .models import Category, Link
 
 
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name"]
+
+    def clean_name(self):
+        # Remove spaces and block duplicates case-insensitive
+        name = self.cleaned_data["name"].strip()
+        if not name:
+            raise forms.ValidationError("Category name cannot be empty.")
+        if Category.objects.filter(name__iexact=name).exists():
+            raise forms.ValidationError("A category with this name already exists.")
+        return name
+
+
 class LinkForm(forms.ModelForm):
     class Meta:
         model = Link

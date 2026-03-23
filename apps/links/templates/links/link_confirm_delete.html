@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Link | CoopLink{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="card bg-base-100 shadow-xl border border-error/20">
+        <div class="card-body">
+            <div>
+                <div class="badge badge-error badge-outline mb-3">Delete</div>
+                <h1 class="card-title text-2xl">Delete this link?</h1>
+                <p class="text-base-content/70">
+                    This action cannot be undone. The link will be removed from your library.
+                </p>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <div class="bg-base-200 rounded-xl p-4">
+                <p class="font-semibold">{{ link.title }}</p>
+                <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                    {{ link.url }}
+                </a>
+                {% if link.category %}
+                    <div class="mt-3 badge badge-outline">{{ link.category.name }}</div>
+                {% endif %}
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-actions justify-end">
+                    <a href="{% url 'links:library' %}" class="btn btn-ghost">Cancel</a>
+                    <button type="submit" class="btn btn-error">Yes, delete link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

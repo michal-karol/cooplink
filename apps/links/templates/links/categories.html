@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Categories | CoopLink{% endblock %}
+
+{% block content %}
+<div class="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
+    <section class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body">
+            <div>
+                <div class="badge badge-primary badge-outline mb-3">Categories</div>
+                <h1 class="card-title text-2xl">Create a category</h1>
+                <p class="text-base-content/70">Use categories to organise links in a consistent way.</p>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        <span>{{ form.non_field_errors }}</span>
+                    </div>
+                {% endif %}
+
+                {% include "includes/forms/input_field.html" with field_id="id_name" field_name="name" label="Category name" input_type="text" placeholder="Example: Research" value=form.name.value errors=form.name.errors %}
+
+                <div class="card-actions justify-end">
+                    <button type="submit" class="btn btn-primary">Create category</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <h2 class="card-title">Existing categories</h2>
+                <div class="badge badge-outline">{{ categories|length }}</div>
+            </div>
+
+            {% if categories %}
+                <div class="grid gap-3 sm:grid-cols-2">
+                    {% for category in categories %}
+                        <div class="border border-base-300 rounded-xl p-4 bg-base-50">
+                            <p class="font-semibold">{{ category.name }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert">
+                    <span>No categories yet. Create the first one.</span>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

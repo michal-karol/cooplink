@@ -34,3 +34,47 @@ class AccountTests(TestCase):
         )
 
         self.assertRedirects(response, reverse("links:dashboard"))
+
+    def test_logged_in_user_can_update_profile(self):
+        user = User.objects.create_user(
+            username="michal",
+            email="old@example.com",
+            password="CoopLink1337",
+        )
+        self.client.login(username="michal", password="CoopLink1337")
+
+        response = self.client.post(
+            reverse("accounts:profile"),
+            {
+                "action": "profile",
+                "first_name": "Michal",
+                "last_name": "Nowak",
+                "email": "new@example.com",
+            },
+        )
+
+        self.assertRedirects(response, reverse("accounts:profile"))
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, "Michal")
+        self.assertEqual(user.last_name, "Nowak")
+        self.assertEqual(user.email, "new@example.com")
+
+    def test_logged_in_user_can_change_password(self):
+        User.objects.create_user(username="michal", password="CoopLink1337")
+        self.client.login(username="michal", password="CoopLink1337")
+
+        response = self.client.post(
+            reverse("accounts:profile"),
+            {
+                "action": "password",
+                "old_password": "CoopLink1337",
+                "new_password1": "NewCoopLink1337",
+                "new_password2": "NewCoopLink1337",
+            },
+        )
+
+        self.assertRedirects(response, reverse("accounts:profile"))
+        self.client.logout()
+        self.assertTrue(
+        self.client.login(username="michal", password="NewCoopLink1337")
+    )

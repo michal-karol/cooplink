@@ -1,14 +1,22 @@
 from django.urls import path
 
-from .views import add_link, dashboard, home
+from .views import (
+    add_link,
+    category_list_create,
+    delete_link,
+    edit_link,
+    home,
+    library_view,
+)
 
 app_name = "links"
 
 urlpatterns = [
-    # Public landing page
     path("", home, name="home"),
-    # Private page for logged-in users
-    path("dashboard/", dashboard, name="dashboard"),
-    # Page dor saving a new link
+    path("dashboard/", library_view, name="dashboard"),
+    path("library/", library_view, name="library"),
+    path("categories/", category_list_create, name="categories"),
     path("links/add/", add_link, name="add_link"),
+    path("links/<int:pk>/edit/", edit_link, name="edit_link"),
+    path("links/<int:pk>/delete/", delete_link, name="delete_link"),
 ]
