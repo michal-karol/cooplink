@@ -10,10 +10,32 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_env_file(path):
+    # Load simple KEY=VALUE pairs from .env into os.environ.
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+# Load local environment variables from .env if the file exists.
+load_env_file(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -136,3 +158,26 @@ LOGIN_REDIRECT_URL = "links:dashboard"
 LOGOUT_REDIRECT_URL = "links:home"
 # If a page needs login redirect to login
 LOGIN_URL = "accounts:login"
+
+# Cloudflare Turnstile
+TURNSTILE_SITE_KEY = (
+    os.getenv("TURNSTILE_SITE_KEY")
+    or os.getenv("CLOUDFLARE_TURNSTILE_SITE_KEY", "")
+)
+TURNSTILE_SECRET_KEY = (
+    os.getenv("TURNSTILE_SECRET_KEY")
+    or os.getenv("CLOUDFLARE_TURNSTILE_SECRET_KEY", "")
+)
+
+# Mailtrap SMTP settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST") or os.getenv("MAILTRAP_HOST", "sandbox.smtp.mailtrap.io")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT") or os.getenv("MAILTRAP_PORT", "2525"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER") or os.getenv("MAILTRAP_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD") or os.getenv("MAILTRAP_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@cooplink.local")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+
+# Email OTP settings
+EMAIL_OTP_EXPIRES_MINUTES = int(os.getenv("EMAIL_OTP_EXPIRES_MINUTES", "10"))

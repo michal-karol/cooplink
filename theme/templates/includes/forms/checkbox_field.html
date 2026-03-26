@@ -1,0 +1,22 @@
+<div class="form-control">
+    <label class="label cursor-pointer justify-start gap-3">
+        <input
+            type="checkbox"
+            name="{{ field_name }}"
+            id="{{ field_id }}"
+            class="checkbox checkbox-primary"
+            {% if checked %}checked{% endif %}
+        >
+        <span class="label-text">{{ label }}</span>
+    </label>
+
+    {% if help_text %}
+        <label class="label pt-0">
+            <span class="label-text-alt text-base-content/60">{{ help_text }}</span>
+        </label>
+    {% endif %}
+
+    {% for error in errors %}
+        <p class="text-sm text-error mt-1">{{ error }}</p>
+    {% endfor %}
+</div>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Login Code | CoopLink{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content w-full justify-center">
+        <div class="card bg-base-100 shadow-xl border border-base-200 w-full max-w-md">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <h1 class="card-title text-2xl">Enter your code</h1>
+                    <span class="badge badge-secondary badge-outline">Step 2</span>
+                </div>
+
+                <p class="text-sm text-base-content/70">
+                    We sent a one-time code to {{ masked_email }}.
+                </p>
+
+                <div class="divider my-1"></div>
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">
+                            <span>{{ form.non_field_errors }}</span>
+                        </div>
+                    {% endif %}
+
+                    {% include "includes/forms/input_field.html" with field_id="id_otp_code" field_name="otp_code" label="One-time code" input_type="text" placeholder="123456" autocomplete="one-time-code" value=form.otp_code.value errors=form.otp_code.errors %}
+
+                    <button type="submit" class="btn btn-primary w-full">Verify code</button>
+                </form>
+
+                <div class="divider my-1"></div>
+
+                <a href="{% url 'accounts:resend_otp' %}" class="btn btn-ghost">Send a new code</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

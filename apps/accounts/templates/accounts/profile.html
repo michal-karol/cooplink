@@ -3,9 +3,9 @@
 {% block title %}Profile | CoopLink{% endblock %}
 
 {% block content %}
-<div class="grid gap-6 lg:grid-cols-2">
-    <section class="card bg-base-100 shadow-xl border border-base-200">
-        <div class="card-body">
+<div class="grid gap-6 lg:grid-cols-2 items-start">
+    <section class="card bg-base-100 shadow-xl border border-base-200 h-full">
+        <div class="card-body h-full">
             <div>
                 <div class="badge badge-primary badge-outline mb-3">Profile</div>
                 <h1 class="card-title text-2xl">Edit your details</h1>
@@ -14,7 +14,7 @@
 
             <div class="divider my-1"></div>
 
-            <form method="post" class="space-y-4">
+            <form method="post" class="flex h-full flex-col gap-4">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="profile">
 
@@ -30,15 +30,15 @@
 
                 {% include "includes/forms/input_field.html" with field_id="id_email" field_name="email" label="Email" input_type="email" placeholder="Email address" autocomplete="email" value=profile_form.email.value errors=profile_form.email.errors %}
 
-                <div class="card-actions justify-end">
+                <div class="card-actions justify-end mt-auto pt-2">
                     <button type="submit" class="btn btn-primary">Save details</button>
                 </div>
             </form>
         </div>
     </section>
 
-    <section class="card bg-base-100 shadow-xl border border-base-200">
-        <div class="card-body">
+    <section class="card bg-base-100 shadow-xl border border-base-200 h-full">
+        <div class="card-body h-full">
             <div>
                 <div class="badge badge-secondary badge-outline mb-3">Security</div>
                 <h2 class="card-title text-2xl">Change password</h2>
@@ -47,7 +47,7 @@
 
             <div class="divider my-1"></div>
 
-            <form method="post" class="space-y-4">
+            <form method="post" class="flex h-full flex-col gap-4">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="password">
 
@@ -63,8 +63,35 @@
 
                 {% include "includes/forms/input_field.html" with field_id=password_form.new_password2.id_for_label field_name="new_password2" label="Confirm new password" input_type="password" placeholder="Confirm new password" autocomplete="new-password" errors=password_form.new_password2.errors %}
 
-                <div class="card-actions justify-end">
+                <div class="card-actions justify-end mt-auto pt-2">
                     <button type="submit" class="btn btn-secondary">Change password</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="card bg-base-100 shadow-xl border border-base-200 lg:col-span-2">
+        <div class="card-body">
+            <div>
+                <div class="badge badge-accent badge-outline mb-3">Preferences</div>
+                <h2 class="card-title text-2xl">Security settings</h2>
+                <p class="text-base-content/70">
+                    Choose whether your account should require an emailed one-time code after the password step.
+                </p>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <form method="post" class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="security">
+
+                <div class="max-w-2xl">
+                    {% include "includes/forms/checkbox_field.html" with field_id="id_enable_email_otp" field_name="enable_email_otp" label="Require a one-time code by email when I log in" checked=security_form.enable_email_otp.value help_text="If enabled, you will receive a fresh code each time you sign in." errors=security_form.enable_email_otp.errors %}
+                </div>
+
+                <div class="card-actions justify-end">
+                    <button type="submit" class="btn btn-primary">Save security settings</button>
                 </div>
             </form>
         </div>

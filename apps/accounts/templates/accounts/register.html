@@ -6,17 +6,17 @@
 <section class="hero">
     <div class="hero-content w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-start">
         <div class="hidden lg:block pt-10">
-            <span class="badge badge-primary badge-outline mb-4">Personal link library</span>
+            <span class="badge badge-primary badge-outline mb-4">Safer account setup</span>
             <h1 class="text-4xl font-bold leading-tight">Create your CoopLink account</h1>
             <p class="py-4 text-base-content/70">
-                Save useful links, keep them organised, and come back to them whenever you need.
+                Register your account, protect the form with a security check, and choose whether to use email one-time codes.
             </p>
 
             <div class="stats shadow bg-base-100">
                 <div class="stat">
-                    <div class="stat-title">All your links</div>
-                    <div class="stat-value text-primary text-2xl">One place</div>
-                    <div class="stat-desc">Organise and revisit what matters</div>
+                    <div class="stat-title">Account security</div>
+                    <div class="stat-value text-primary text-2xl">Optional OTP</div>
+                    <div class="stat-desc">Email-based login code when you want extra protection</div>
                 </div>
             </div>
         </div>
@@ -24,7 +24,9 @@
         <div class="card bg-base-100 shadow-xl border border-base-200 w-full max-w-md mx-auto">
             <div class="card-body">
                 <h2 class="card-title text-2xl">Create an account</h2>
-                <p class="text-sm text-base-content/70">Join CoopLink and start building your personal link library.</p>
+                <p class="text-sm text-base-content/70">
+                    Choose your account details and security preferences.
+                </p>
 
                 <div class="divider my-1"></div>
 
@@ -45,6 +47,22 @@
 
                     {% include "includes/forms/input_field.html" with field_id="id_password2" field_name="password2" label="Confirm password" input_type="password" placeholder="Confirm password" autocomplete="new-password" errors=form.password2.errors %}
 
+                    {% include "includes/forms/checkbox_field.html" with field_id="id_enable_email_otp" field_name="enable_email_otp" label="Use a one-time code by email when I log in" checked=form.enable_email_otp.value help_text="You can change this later in your profile settings." errors=form.enable_email_otp.errors %}
+
+                    <div class="space-y-2">
+                        <label class="label">
+                            <span class="label-text">Security check</span>
+                        </label>
+                        <div class="turnstile-shell rounded-xl bg-base-100 p-2 overflow-hidden">
+                            <div
+                                class="cf-turnstile"
+                                data-sitekey="{{ turnstile_site_key }}"
+                                data-theme="dark"
+                                data-size="flexible"
+                            ></div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-full">Register</button>
                 </form>
 
@@ -58,4 +76,13 @@
         </div>
     </div>
 </section>
+
+<style>
+    .turnstile-shell .cf-turnstile {
+        display: block;
+        width: 100%;
+    }
+</style>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endblock %}

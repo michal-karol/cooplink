@@ -9,10 +9,12 @@
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <h1 class="card-title text-2xl">Log in</h1>
-                    <span class="badge badge-secondary badge-outline">Welcome back</span>
+                    <span class="badge badge-secondary badge-outline">Protected sign-in</span>
                 </div>
 
-                <p class="text-sm text-base-content/70">Enter your details to open your dashboard.</p>
+                <p class="text-sm text-base-content/70">
+                    Enter your password. If email one-time codes are enabled, you will verify with a code next.
+                </p>
 
                 <div class="divider my-1"></div>
 
@@ -21,16 +23,34 @@
 
                     {% if form.non_field_errors %}
                         <div class="alert alert-error">
-                            <span>Invalid username or password.</span>
+                            <span>{{ form.non_field_errors }}</span>
                         </div>
                     {% endif %}
 
-                    {% include "includes/forms/input_field.html" with field_id=form.username.id_for_label field_name="username" label="Username" input_type="text" placeholder="Enter your username" autocomplete="username" value=form.username.value errors=form.username.errors %}
+                    {% include "includes/forms/input_field.html" with field_id="id_username" field_name="username" label="Username" input_type="text" placeholder="Enter your username" autocomplete="username" value=form.username.value errors=form.username.errors %}
 
-                    {% include "includes/forms/input_field.html" with field_id=form.password.id_for_label field_name="password" label="Password" input_type="password" placeholder="Enter your password" autocomplete="current-password" errors=form.password.errors %}
+                    {% include "includes/forms/input_field.html" with field_id="id_password" field_name="password" label="Password" input_type="password" placeholder="Enter your password" autocomplete="current-password" errors=form.password.errors %}
 
-                    <button type="submit" class="btn btn-primary w-full">Log in</button>
+                    <div class="space-y-2">
+                        <label class="label">
+                            <span class="label-text">Security check</span>
+                        </label>
+                        <div class="turnstile-shell rounded-xl bg-base-100 p-2 overflow-hidden">
+                            <div
+                                class="cf-turnstile"
+                                data-sitekey="{{ turnstile_site_key }}"
+                                data-theme="dark"
+                                data-size="flexible"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full">Continue</button>
                 </form>
+
+                <p class="text-sm text-center">
+                    <a href="{% url 'accounts:password_reset' %}" class="link link-primary">Forgot your password?</a>
+                </p>
 
                 <div class="divider text-xs">NEW HERE?</div>
 
@@ -42,4 +62,13 @@
         </div>
     </div>
 </section>
+
+<style>
+    .turnstile-shell .cf-turnstile {
+        display: block;
+        width: 100%;
+    }
+</style>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endblock %}
