@@ -152,3 +152,39 @@ class LinkTests(TestCase):
         response = self.client.get(reverse("links:edit_link", args=[link.pk]))
 
         self.assertEqual(response.status_code, 404)
+
+    def test_logged_in_user_can_export_only_their_own_links(self):
+        # Log in as the test user.
+        self.client.login(username="michal", password="CoopLink1337")
+
+        # Create one new link owned by the logged user
+        Link.objects.create(
+            user=self.user,
+            category=self.category,
+            title="My link",
+            url="https://example.com/mine",
+            description="Mine",
+        )
+        # Create another link owned by another user.
+        Link.objects.create(
+            user=self.other_user,
+            category=self.category,
+            title="Other user link",
+            url="https://example.com/other",
+            description="Other",
+        )
+
+        # Download the export 
+        response = self.client.get(reverse("links:export_links_csv"))
+
+        # Check both the response type and the exported content
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertIn("attachment;", response["Content-Disposition"])
+        self.assertContains(response, "My link")
+        self.assertNotContains(response, "Other user link")
+
+    def test_anonymous_user_cannot_export_links(self):
+        # Anonymous users should be redirected to login by @login_required 
+        response = self.client.get(reverse("links:export_links_csv"))
+        self.assertEqual(response.status_code, 302)

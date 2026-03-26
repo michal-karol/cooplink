@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+import csv
 
+from django.http import HttpResponse
 from .forms import CategoryForm, LinkForm
 from .models import Category, Link
 
@@ -141,3 +143,52 @@ def category_list_create(request):
             "categories": categories,
         },
     )
+
+@login_required
+def export_links_csv(request):
+    # Only export the current users links
+    links = (
+        # Load category data in the same query for better performance
+        Link.objects.filter(user=request.user)
+        .select_related("category")
+        .order_by("-created_at")
+    )
+
+    # Tell the browser this response should be downloaded as a CSV file
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="cooplink-links.csv"'
+
+    # csv.writer handles escaping and commas safely
+    writer = csv.writer(response)
+
+    # Header row
+    writer.writerow(
+        [
+            "title",
+            "url",
+            "description",
+            "category",
+            "is_shared",
+            "is_pinned",
+            "created_at",
+            "updated_at",
+        ]
+    )
+
+    for link in links:
+        writer.writerow(
+            [
+                link.title,
+                link.url,
+                link.description,
+                # handle safely links without category
+                link.category.name if link.category else "",
+                # getattr keeps the export compatible if these fields are added later
+                "true" if getattr(link, "is_shared", False) else "false",
+                "true" if getattr(link, "is_pinned", False) else "false",
+                link.created_at.isoformat(),
+                link.updated_at.isoformat(),
+            ]
+        )
+
+    return response
