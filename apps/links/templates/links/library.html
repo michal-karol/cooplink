@@ -71,11 +71,19 @@
                                     </a>
                                 </div>
 
-                                {% if link.category %}
-                                    <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
-                                {% else %}
-                                    <div class="badge badge-ghost">Uncategorised</div>
-                                {% endif %}
+                                <div class="flex flex-col items-end gap-2">
+                                    {% if link.category %}
+                                        <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
+                                    {% else %}
+                                        <div class="badge badge-ghost">Uncategorised</div>
+                                    {% endif %}
+
+                                    {% if link.is_shared %}
+                                        <div class="badge badge-secondary badge-outline">Shared</div>
+                                    {% else %}
+                                        <div class="badge badge-ghost">Private</div>
+                                    {% endif %}
+                                </div>
                             </div>
 
                             {% if link.description %}
@@ -83,6 +91,15 @@
                             {% endif %}
 
                             <div class="card-actions justify-end">
+                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'links:library' %}">
+                                    {% if link.is_pinned %}
+                                        <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-sm btn-warning">Pin</button>
+                                    {% endif %}
+                                </form>
                                 <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
                                 <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                                 <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
@@ -99,6 +116,7 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Category</th>
+                                <th>Status</th>
                                 <th>URL</th>
                                 <th class="text-right">Actions</th>
                             </tr>
@@ -115,12 +133,28 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        {% if link.is_shared %}
+                                            <span class="badge badge-secondary badge-outline">Shared</span>
+                                        {% else %}
+                                            <span class="badge badge-ghost">Private</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
                                             {{ link.url }}
                                         </a>
                                     </td>
                                     <td>
                                         <div class="flex justify-end gap-2">
+                                            <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{% url 'links:library' %}">
+                                                {% if link.is_pinned %}
+                                                    <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn-sm btn-warning">Pin</button>
+                                                {% endif %}
+                                            </form>
                                             <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
                                             <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                                             <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>

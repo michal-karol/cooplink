@@ -33,6 +33,8 @@
 
                 {% include "includes/forms/select_field.html" with field_id="id_category" field_name="category" label="Category (optional)" empty_option_label="No category" options=form.category.field.queryset selected_value=form.category.value help_text="Leave this blank if you do not want to choose a category yet." errors=form.category.errors %}
 
+                {% include "includes/forms/checkbox_field.html" with field_id="id_is_shared" field_name="is_shared" label="Share this link on the shared dashboard" checked=form.is_shared.value help_text="Shared links are visible to all signed-in users." errors=form.is_shared.errors %}
+
                 <div class="card-actions justify-end">
                     <a href="{% url 'links:library' %}" class="btn btn-ghost">Cancel</a>
                     <button type="submit" class="btn btn-primary">{{ submit_label }}</button>

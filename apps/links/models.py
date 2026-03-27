@@ -29,6 +29,10 @@ class Link(models.Model):
     title = models.CharField(max_length=200)
     url = models.URLField(validators=[URLValidator()])
     description = models.TextField(blank=True)
+    # Shared links appear on the shared dashboard for all users.
+    is_shared = models.BooleanField(default=False)
+    # Pinned links appear first on the owner's personal dashboard.
+    is_pinned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -7,18 +7,21 @@ from .views import (
     edit_link,
     home,
     library_view,
-    export_links_csv,
+    personal_dashboard,
+    shared_dashboard,
+    toggle_pin,
 )
 
 app_name = "links"
 
 urlpatterns = [
     path("", home, name="home"),
-    path("dashboard/", library_view, name="dashboard"),
+    path("dashboard/", personal_dashboard, name="dashboard"),
     path("library/", library_view, name="library"),
+    path("shared/", shared_dashboard, name="shared_dashboard"),
     path("categories/", category_list_create, name="categories"),
     path("links/add/", add_link, name="add_link"),
     path("links/<int:pk>/edit/", edit_link, name="edit_link"),
     path("links/<int:pk>/delete/", delete_link, name="delete_link"),
-    path("library/export/csv/", export_links_csv, name="export_links_csv"),
+    path("links/<int:pk>/toggle-pin/", toggle_pin, name="toggle_pin"),
 ]

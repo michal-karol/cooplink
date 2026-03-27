@@ -14,22 +14,20 @@
                 <a href="{% url 'links:home' %}" class="btn btn-ghost text-xl normal-case">CoopLink</a>
             </div>
 
-            <div class="flex-none">
+            <div class="flex-none gap-2">
                 {% if request.user.is_authenticated %}
-                    <div class="flex items-center gap-2">
-                        <a href="{% url 'links:dashboard' %}" class="btn btn-ghost">Library</a>
-                        <a href="{% url 'links:categories' %}" class="btn btn-ghost">Categories</a>
-                        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Profile</a>
-                        <form method="post" action="{% url 'accounts:logout' %}" class="m-0 inline-flex">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Logout</button>
-                        </form>
-                    </div>
+                    <a href="{% url 'links:dashboard' %}" class="btn btn-ghost">Dashboard</a>
+                    <a href="{% url 'links:library' %}" class="btn btn-ghost">Library</a>
+                    <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost">Shared</a>
+                    <a href="{% url 'links:categories' %}" class="btn btn-ghost">Categories</a>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Profile</a>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
                 {% else %}
-                    <div class="flex items-center gap-2">
-                        <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Login</a>
-                        <a href="{% url 'accounts:register' %}" class="btn btn-primary">Register</a>
-                    </div>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary">Register</a>
                 {% endif %}
             </div>
         </nav>
@@ -50,7 +48,7 @@
 
         <footer class="footer footer-center p-6 text-base-content/60">
             <aside>
-                <p>CoopLink helps you save, organise, and revisit useful links.</p>
+                <p>CoopLink helps you save, organise, and share useful links.</p>
             </aside>
         </footer>
     </div>

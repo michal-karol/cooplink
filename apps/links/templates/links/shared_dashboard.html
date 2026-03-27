@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Dashboard | CoopLink{% endblock %}
+
+{% block content %}
+<div class="grid gap-6">
+    <section class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body gap-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <div class="badge badge-secondary badge-outline mb-3">Shared dashboard</div>
+                    <h1 class="text-3xl font-bold">Links shared by the team</h1>
+                    <p class="text-base-content/70">Browse links made visible to everyone in the app.</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'links:dashboard' %}" class="btn btn-outline">Personal dashboard</a>
+                    <a href="{% url 'links:library' %}" class="btn btn-outline">My library</a>
+                </div>
+            </div>
+
+            <form method="get" class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_auto]">
+                <div>
+                    {% include "includes/forms/input_field.html" with field_id="id_q" field_name="q" label="Search shared links" input_type="text" placeholder="Search by title, category, or user" value=query errors="" %}
+                </div>
+
+                <div>
+                    {% include "includes/forms/select_field.html" with field_id="id_category" field_name="category" label="Category" empty_option_label="All categories" options=categories selected_value=selected_category errors="" %}
+                </div>
+
+                <div class="flex items-end gap-3">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost">Clear</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    {% if page_obj.object_list %}
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {% for link in page_obj %}
+                <article class="card bg-base-100 shadow border border-base-200 hover:shadow-lg transition-shadow">
+                    <div class="card-body">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <h2 class="card-title">{{ link.title }}</h2>
+                                <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                                    {{ link.url }}
+                                </a>
+                            </div>
+                            <div class="badge badge-secondary">Shared</div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            {% if link.category %}
+                                <div class="badge badge-outline">{{ link.category.name }}</div>
+                            {% endif %}
+                            <div class="badge badge-ghost">Shared by {{ link.user.username }}</div>
+                        </div>
+
+                        {% if link.description %}
+                            <p class="text-base-content/80">{{ link.description }}</p>
+                        {% endif %}
+
+                        <div class="card-actions justify-end">
+                            <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="flex justify-center">
+            <div class="join">
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&page={{ page_obj.previous_page_number }}"
+                        class="btn join-item"
+                    >
+                        Previous
+                    </a>
+                {% endif %}
+
+                <button class="btn join-item btn-disabled">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </button>
+
+                {% if page_obj.has_next %}
+                    <a
+                        href="?q={{ query }}&category={{ selected_category }}&page={{ page_obj.next_page_number }}"
+                        class="btn join-item"
+                    >
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card bg-base-100 shadow-xl border border-base-200">
+            <div class="card-body">
+                <div class="badge badge-outline mb-2 w-fit">No shared links</div>
+                <h2 class="card-title">No matching shared links found</h2>
+                <p class="text-base-content/70">
+                    Try a different search term or ask someone to share a useful link.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

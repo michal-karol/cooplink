@@ -21,7 +21,7 @@ class CategoryForm(forms.ModelForm):
 class LinkForm(forms.ModelForm):
     class Meta:
         model = Link
-        fields = ["title", "url", "description", "category"]
+        fields = ["title", "url", "description", "category", "is_shared"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,6 +30,7 @@ class LinkForm(forms.ModelForm):
         # Category is optional
         self.fields["category"].required = False
         self.fields["category"].empty_label = "No category"
+        self.fields["is_shared"].required = False
 
     def clean_title(self):
         # Strip spaces from the start or end of the title

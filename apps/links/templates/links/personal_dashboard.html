@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | CoopLink{% endblock %}
+
+{% block content %}
+<div class="grid gap-6">
+    <section class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body gap-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <div class="badge badge-primary badge-outline mb-3">Personal dashboard</div>
+                    <h1 class="text-3xl font-bold">Your important links</h1>
+                    <p class="text-base-content/70">Pinned links stay at the top so you can reach them faster.</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'links:library' %}" class="btn btn-outline">Open full library</a>
+                    <a href="{% url 'links:shared_dashboard' %}" class="btn btn-outline">Shared dashboard</a>
+                    <a href="{% url 'links:add_link' %}" class="btn btn-primary">Save new link</a>
+                </div>
+            </div>
+
+            <div class="stats stats-vertical md:stats-horizontal shadow">
+                <div class="stat">
+                    <div class="stat-title">Saved links</div>
+                    <div class="stat-value text-primary">{{ total_links }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Pinned</div>
+                    <div class="stat-value text-secondary">{{ pinned_links_count }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Shared by you</div>
+                    <div class="stat-value">{{ shared_links_count }}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold">Pinned links</h2>
+            <div class="badge badge-outline">{{ pinned_links_count }}</div>
+        </div>
+
+        {% if pinned_links %}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for link in pinned_links %}
+                    <article class="card bg-base-100 shadow border border-base-200">
+                        <div class="card-body">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 class="card-title">{{ link.title }}</h3>
+                                    <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                                        {{ link.url }}
+                                    </a>
+                                </div>
+                                <div class="flex flex-col items-end gap-2">
+                                    <div class="badge badge-warning">Pinned</div>
+                                    {% if link.is_shared %}
+                                        <div class="badge badge-secondary badge-outline">Shared</div>
+                                    {% else %}
+                                        <div class="badge badge-ghost">Private</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if link.category %}
+                                <div class="badge badge-outline w-fit">{{ link.category.name }}</div>
+                            {% endif %}
+
+                            {% if link.description %}
+                                <p class="text-base-content/80">{{ link.description }}</p>
+                            {% endif %}
+
+                            <div class="card-actions justify-end">
+                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'links:dashboard' %}">
+                                    <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
+                                </form>
+                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card bg-base-100 shadow border border-base-200">
+                <div class="card-body">
+                    <h3 class="card-title">No pinned links yet</h3>
+                    <p class="text-base-content/70">
+                        Pin important links from your library so they always appear at the top of this dashboard.
+                    </p>
+                    <div class="card-actions justify-end">
+                        <a href="{% url 'links:library' %}" class="btn btn-primary">Open library</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="grid gap-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold">Recent links</h2>
+            <a href="{% url 'links:library' %}" class="link link-primary">View all</a>
+        </div>
+
+        {% if recent_links %}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for link in recent_links %}
+                    <article class="card bg-base-100 shadow border border-base-200">
+                        <div class="card-body">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 class="card-title">{{ link.title }}</h3>
+                                    <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
+                                        {{ link.url }}
+                                    </a>
+                                </div>
+                                {% if link.is_shared %}
+                                    <div class="badge badge-secondary badge-outline">Shared</div>
+                                {% else %}
+                                    <div class="badge badge-ghost">Private</div>
+                                {% endif %}
+                            </div>
+
+                            {% if link.category %}
+                                <div class="badge badge-outline w-fit">{{ link.category.name }}</div>
+                            {% endif %}
+
+                            <div class="card-actions justify-end">
+                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'links:dashboard' %}">
+                                    <button type="submit" class="btn btn-sm btn-warning">Pin</button>
+                                </form>
+                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card bg-base-100 shadow border border-base-200">
+                <div class="card-body">
+                    <h3 class="card-title">No saved links yet</h3>
+                    <p class="text-base-content/70">Save a link to start building your dashboard.</p>
+                    <div class="card-actions justify-end">
+                        <a href="{% url 'links:add_link' %}" class="btn btn-primary">Save your first link</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
