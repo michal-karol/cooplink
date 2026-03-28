@@ -44,8 +44,8 @@
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <h2 class="card-title">{{ link.title }}</h2>
-                                <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
-                                    {{ link.url }}
+                                <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
+                                    {{ link.url|display_url }}
                                 </a>
                             </div>
                             <div class="badge badge-secondary">Shared</div>

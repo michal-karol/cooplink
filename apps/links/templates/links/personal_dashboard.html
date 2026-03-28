@@ -51,8 +51,8 @@
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="card-title">{{ link.title }}</h3>
-                                    <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
-                                        {{ link.url }}
+                                    <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
+                                        {{ link.url|display_url }}
                                     </a>
                                 </div>
                                 <div class="flex flex-col items-end gap-2">
@@ -115,8 +115,8 @@
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="card-title">{{ link.title }}</h3>
-                                    <a href="{{ link.url }}" target="_blank" class="link link-primary break-all">
-                                        {{ link.url }}
+                                    <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
+                                        {{ link.url|display_url }}
                                     </a>
                                 </div>
                                 {% if link.is_shared %}

@@ -14,22 +14,48 @@
                 <a href="{% url 'links:home' %}" class="btn btn-ghost text-xl normal-case">CoopLink</a>
             </div>
 
-            <div class="flex-none gap-2">
-                {% if request.user.is_authenticated %}
+            {% if request.user.is_authenticated %}
+                <div class="flex-none lg:hidden">
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost btn-circle" aria-label="Open navigation menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+                            </svg>
+                        </label>
+                        <ul tabindex="0" class="menu dropdown-content mt-3 z-[1] w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+                            <li><a href="{% url 'links:dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'links:library' %}">Library</a></li>
+                            <li><a href="{% url 'links:shared_dashboard' %}">Shared</a></li>
+                            <li><a href="{% url 'links:categories' %}">Categories</a></li>
+                            <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li>
+                                <form method="post" action="{% url 'accounts:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full text-left">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="hidden lg:flex lg:flex-none lg:items-center lg:gap-2">
                     <a href="{% url 'links:dashboard' %}" class="btn btn-ghost">Dashboard</a>
                     <a href="{% url 'links:library' %}" class="btn btn-ghost">Library</a>
                     <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost">Shared</a>
                     <a href="{% url 'links:categories' %}" class="btn btn-ghost">Categories</a>
                     <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Profile</a>
+                    <div class="mx-1 h-6 w-px bg-base-300"></div>
                     <form method="post" action="{% url 'accounts:logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary">Logout</button>
                     </form>
-                {% else %}
+                </div>
+            {% else %}
+                <div class="flex-none flex items-center gap-2">
                     <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Login</a>
                     <a href="{% url 'accounts:register' %}" class="btn btn-primary">Register</a>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </nav>
 
         <main class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
