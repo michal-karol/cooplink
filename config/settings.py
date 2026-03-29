@@ -11,46 +11,42 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+import environ
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def load_env_file(path):
-    # Load simple KEY=VALUE pairs from .env into os.environ.
-    if not path.exists():
-        return
-
-    for raw_line in path.read_text().splitlines():
-        line = raw_line.strip()
-
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        os.environ.setdefault(key, value)
+env = environ.Env(
+    DEBUG=(bool, False),
+    EMAIL_PORT=(int, 2525),
+    EMAIL_USE_TLS=(bool, True),
+    EMAIL_OTP_EXPIRES_MINUTES=(int, 10),
+    SERVE_MEDIA=(bool, False),
+)
+environ.Env.read_env(BASE_DIR / ".env")
 
 
-# Load local environment variables from .env if the file exists.
-load_env_file(BASE_DIR / ".env")
+def env_first(*keys, default=""):
+    for key in keys:
+        value = os.getenv(key)
+        if value not in (None, ""):
+            return value
+    return default
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-!01j04(qfj5p0lzkg(ps%6m&b@4#!hc!lj_aq0$%tk+@enzat*"
+SECRET_KEY = env_first("SECRET_KEY", default="django-insecure-dev-only-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,7 +58,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.links",
     "tailwind",
-    "theme"
+    "theme",
 ]
 
 if DEBUG:
@@ -72,6 +68,7 @@ TAILWIND_APP_NAME = "theme"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -104,19 +101,21 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# Use DATABASE_URL when present. This supports PostgreSQL in Docker and deployment.
+# If DATABASE_URL is missing, Django falls back to SQLite for quick local setup.
+RUNNING_TESTS = "test" in sys.argv
+default_database_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+if RUNNING_TESTS:
+    # Tests default to SQLite unless TEST_DATABASE_URL is provided explicitly.
+    default_database_url = f"sqlite:///{BASE_DIR / 'test_db.sqlite3'}"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": env.db(
+        "TEST_DATABASE_URL" if RUNNING_TESTS else "DATABASE_URL",
+        default=default_database_url,
+    )
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -134,9 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -146,10 +142,27 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG or RUNNING_TESTS
+            else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        ),
+    },
+}
+
+WHITENOISE_USE_FINDERS = DEBUG or RUNNING_TESTS
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+SERVE_MEDIA = env.bool("SERVE_MEDIA", default=DEBUG)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -161,24 +174,37 @@ LOGOUT_REDIRECT_URL = "links:home"
 LOGIN_URL = "accounts:login"
 
 # Cloudflare Turnstile
-TURNSTILE_SITE_KEY = (
-    os.getenv("TURNSTILE_SITE_KEY")
-    or os.getenv("CLOUDFLARE_TURNSTILE_SITE_KEY", "")
+TURNSTILE_ENABLED = env_first(
+    "TURNSTILE_ENABLED",
+    "CLOUDFLARE_TURNSTILE_ENABLED",
+    default="true",
+).lower() in {"1", "true", "yes", "on"}
+TURNSTILE_SITE_KEY = env_first(
+    "TURNSTILE_SITE_KEY",
+    "CLOUDFLARE_TURNSTILE_SITE_KEY",
+    default="",
 )
-TURNSTILE_SECRET_KEY = (
-    os.getenv("TURNSTILE_SECRET_KEY")
-    or os.getenv("CLOUDFLARE_TURNSTILE_SECRET_KEY", "")
+TURNSTILE_SECRET_KEY = env_first(
+    "TURNSTILE_SECRET_KEY",
+    "CLOUDFLARE_TURNSTILE_SECRET_KEY",
+    default="",
 )
 
-# Mailtrap SMTP settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST") or os.getenv("MAILTRAP_HOST", "sandbox.smtp.mailtrap.io")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT") or os.getenv("MAILTRAP_PORT", "2525"))
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER") or os.getenv("MAILTRAP_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD") or os.getenv("MAILTRAP_PASSWORD", "")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@cooplink.local")
-SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+# Mail settings
+EMAIL_BACKEND = env_first(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
+)
+EMAIL_HOST = env_first("EMAIL_HOST", "MAILTRAP_HOST", default="sandbox.smtp.mailtrap.io")
+EMAIL_PORT = int(env_first("EMAIL_PORT", "MAILTRAP_PORT", default="2525"))
+EMAIL_HOST_USER = env_first("EMAIL_HOST_USER", "MAILTRAP_USER", default="")
+EMAIL_HOST_PASSWORD = env_first("EMAIL_HOST_PASSWORD", "MAILTRAP_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env_first(
+    "DEFAULT_FROM_EMAIL",
+    default="no-reply@cooplink.local",
+)
+SERVER_EMAIL = env_first("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 
 # Email OTP settings
-EMAIL_OTP_EXPIRES_MINUTES = int(os.getenv("EMAIL_OTP_EXPIRES_MINUTES", "10"))
+EMAIL_OTP_EXPIRES_MINUTES = env.int("EMAIL_OTP_EXPIRES_MINUTES", default=10)
