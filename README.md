@@ -198,6 +198,31 @@ python manage.py test
 
 If `TEST_DATABASE_URL` is not set, tests fall back to SQLite. CI uses PostgreSQL.
 
+## Security Checks
+
+Install the audit tool locally if needed:
+
+```bash
+python -m pip install pip-audit
+```
+
+Run the dependency vulnerability scan:
+
+```bash
+pip-audit -r requirements.txt
+```
+
+Check for outdated packages:
+
+```bash
+pip list --outdated
+```
+
+Note:
+
+- `pip-audit -r requirements.txt` fails when known vulnerabilities are found
+- `pip list --outdated` is informational and helps plan upgrades
+
 ## CI
 
 GitHub Actions runs on pushes to `main` and on pull requests. The workflow:
