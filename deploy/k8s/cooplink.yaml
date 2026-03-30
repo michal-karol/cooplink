@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cooplink-secret
+type: Opaque
+stringData:
+  SECRET_KEY: "change-this-in-real-use"
+  POSTGRES_PASSWORD: "change-this-password"
+  DATABASE_URL: "postgresql://cooplink:change-this-password@postgres:5432/cooplink"
+  TURNSTILE_SITE_KEY: "replace-with-your-turnstile-site-key"
+  TURNSTILE_SECRET_KEY: "replace-with-your-turnstile-secret-key"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "cooplink"
+            - name: POSTGRES_USER
+              value: "cooplink"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cooplink-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cooplink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cooplink
+  template:
+    metadata:
+      labels:
+        app: cooplink
+    spec:
+      containers:
+        - name: cooplink
+          image: your-dockerhub-user/cooplink:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cooplink-secret
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cooplink-secret
+                  key: DATABASE_URL
+            - name: TURNSTILE_SITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cooplink-secret
+                  key: TURNSTILE_SITE_KEY
+            - name: TURNSTILE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cooplink-secret
+                  key: TURNSTILE_SECRET_KEY
+            - name: DEBUG
+              value: "False"
+            - name: ALLOWED_HOSTS
+              value: "*"
+          command:
+            - /bin/sh
+            - -c
+            - python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cooplink
+spec:
+  selector:
+    app: cooplink
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer

@@ -173,12 +173,7 @@ LOGOUT_REDIRECT_URL = "links:home"
 # If a page needs login redirect to login
 LOGIN_URL = "accounts:login"
 
-# Cloudflare Turnstile
-TURNSTILE_ENABLED = env_first(
-    "TURNSTILE_ENABLED",
-    "CLOUDFLARE_TURNSTILE_ENABLED",
-    default="true",
-).lower() in {"1", "true", "yes", "on"}
+# Cloudflare Turnstile is required on registration and password login forms.
 TURNSTILE_SITE_KEY = env_first(
     "TURNSTILE_SITE_KEY",
     "CLOUDFLARE_TURNSTILE_SITE_KEY",

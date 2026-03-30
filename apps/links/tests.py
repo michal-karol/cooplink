@@ -199,6 +199,26 @@ class LinkTests(TestCase):
         link.refresh_from_db()
         self.assertFalse(link.is_pinned)
 
+    def test_user_cannot_pin_another_users_link(self):
+        # A user must not be able to pin or unpin someone else's link.
+        link = Link.objects.create(
+            user=self.other_user,
+            category=self.category,
+            title="Not yours",
+            url="https://example.com/not-yours",
+            description="Owned by another user",
+        )
+        self.client.login(username="michal", password="CoopLink1337")
+
+        response = self.client.post(
+            reverse("links:toggle_pin", args=[link.pk]),
+            {"next": reverse("links:dashboard")},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        link.refresh_from_db()
+        self.assertFalse(link.is_pinned)
+
     def test_shared_link_appears_on_shared_dashboard(self):
         # Create a shared link owned by the first user.
         Link.objects.create(
@@ -253,3 +273,31 @@ class LinkTests(TestCase):
         )
 
         self.assertContains(response, "Design system")
+
+    def test_shared_dashboard_filter_by_category(self):
+        # Shared dashboard category filtering should only show matching links.
+        Link.objects.create(
+            user=self.user,
+            category=self.category,
+            title="Research handbook",
+            url="https://example.com/research-handbook",
+            description="Research guide",
+            is_shared=True,
+        )
+        Link.objects.create(
+            user=self.other_user,
+            category=self.other_category,
+            title="Design tokens",
+            url="https://example.com/design-tokens",
+            description="Design guide",
+            is_shared=True,
+        )
+        self.client.login(username="michal", password="CoopLink1337")
+
+        response = self.client.get(
+            reverse("links:shared_dashboard"),
+            {"category": str(self.category.pk)},
+        )
+
+        self.assertContains(response, "Research handbook")
+        self.assertNotContains(response, "Design tokens")

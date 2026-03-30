@@ -26,13 +26,14 @@ def get_client_ip(request):
 
 
 def validate_turnstile(request):
+    # Registration and password login are protected by a required Turnstile check.
     token = request.POST.get("cf-turnstile-response", "").strip()
 
     if not token:
         return False, "Please complete the security check."
 
     if not settings.TURNSTILE_SECRET_KEY:
-        return False, "Turnstile is not configured"
+        return False, "Turnstile is required but not configured."
 
     try:
         response = requests.post(
