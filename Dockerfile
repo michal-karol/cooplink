@@ -20,9 +20,10 @@ RUN cd theme/static_src && npm install
 
 COPY . .
 
-# Build Tailwind CSS and collect static files for deployment.
-RUN python manage.py tailwind build
-RUN python manage.py collectstatic --noinput
+# Build static assets using production storage settings so the manifest exists
+# when the container later starts with DEBUG=False.
+RUN DEBUG=False python manage.py tailwind build
+RUN DEBUG=False python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
