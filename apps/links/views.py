@@ -3,9 +3,21 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import CategoryForm, LinkForm
 from .models import Category, Link
+
+
+def get_safe_next_url(request, default_url):
+    next_url = request.GET.get("next") or request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+    ):
+        return next_url
+    return default_url
 
 
 def home(request):
@@ -135,13 +147,14 @@ def add_link(request):
 @login_required
 def edit_link(request, pk):
     link = get_object_or_404(Link, pk=pk, user=request.user)
+    next_url = get_safe_next_url(request, reverse("links:library"))
 
     if request.method == "POST":
         form = LinkForm(request.POST, instance=link)
         if form.is_valid():
             form.save()
             messages.success(request, "Link updated successfully.")
-            return redirect("links:library")
+            return redirect(next_url)
     else:
         form = LinkForm(instance=link)
 
@@ -154,6 +167,7 @@ def edit_link(request, pk):
             "page_badge": "Update link",
             "page_description": "Change the details of a saved link, including whether it is shared.",
             "submit_label": "Save changes",
+            "next_url": next_url,
         },
     )
 
@@ -174,17 +188,17 @@ def delete_link(request, pk):
 def toggle_pin(request, pk):
     # A user can only pin or unpin their own links.
     link = get_object_or_404(Link, pk=pk, user=request.user)
+    next_url = get_safe_next_url(request, reverse("links:dashboard"))
 
     if request.method == "POST":
         link.is_pinned = not link.is_pinned
-        link.save(update_fields=["is_pinned"])
+        link.save(update_fields=["is_pinned", "updated_at"])
 
         if link.is_pinned:
             messages.success(request, "Link pinned to your dashboard.")
         else:
             messages.success(request, "Link removed from your pinned links.")
 
-    next_url = request.POST.get("next") or "links:dashboard"
     return redirect(next_url)
 
 

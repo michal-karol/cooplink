@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import (
     LoginPasswordForm,
@@ -23,6 +24,18 @@ from .security import (
 
 
 PENDING_AUTH_SESSION_KEY = "pending_auth_user_id"
+
+
+def mask_email(email):
+    if not email or "@" not in email:
+        return email
+
+    local, domain = email.split("@", 1)
+    if len(local) <= 2:
+        visible_local = local[:1]
+    else:
+        visible_local = local[:2]
+    return f"{visible_local}***@{domain}"
 
 
 def register_view(request):
@@ -144,7 +157,7 @@ def otp_verify_view(request):
         "accounts/otp_verify.html",
         {
             "form": form,
-            "masked_email": user.email,
+            "masked_email": mask_email(user.email),
         },
     )
 
@@ -162,6 +175,7 @@ def resend_otp_view(request):
     return redirect("accounts:otp_verify")
 
 
+@require_POST
 def logout_view(request):
     # Clear any leftover OTP state before ending the session
     if request.user.is_authenticated:

@@ -18,6 +18,9 @@
 
             <form method="post" class="space-y-4">
                 {% csrf_token %}
+                {% if next_url %}
+                    <input type="hidden" name="next" value="{{ next_url }}">
+                {% endif %}
 
                 {% if form.non_field_errors %}
                     <div class="alert alert-error">

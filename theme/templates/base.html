@@ -62,7 +62,7 @@
             {% if messages %}
                 <div class="space-y-3 mb-6">
                     {% for message in messages %}
-                        <div class="alert alert-success shadow-sm">
+                        <div class="alert {% if 'error' in message.tags %}alert-error{% elif 'warning' in message.tags %}alert-warning{% elif 'info' in message.tags %}alert-info{% else %}alert-success{% endif %} shadow-sm">
                             <span>{{ message }}</span>
                         </div>
                     {% endfor %}

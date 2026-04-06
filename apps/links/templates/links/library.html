@@ -44,13 +44,13 @@
 
                 <div class="join">
                     <a
-                        href="?q={{ query }}&category={{ selected_category }}&view=cards"
+                        href="?q={{ query }}&category={{ selected_category }}&view=cards&page={{ page_obj.number }}"
                         class="btn join-item {% if view_mode == 'cards' %}btn-primary{% else %}btn-outline{% endif %}"
                     >
                         Cards
                     </a>
                     <a
-                        href="?q={{ query }}&category={{ selected_category }}&view=list"
+                        href="?q={{ query }}&category={{ selected_category }}&view=list&page={{ page_obj.number }}"
                         class="btn join-item {% if view_mode == 'list' %}btn-primary{% else %}btn-outline{% endif %}"
                     >
                         List
@@ -104,7 +104,7 @@
                                     {% endif %}
                                 </form>
                                 <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                                <a href="{% url 'links:edit_link' link.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-secondary">Edit</a>
                                 <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
                             </div>
                         </div>
@@ -159,7 +159,7 @@
                                                 {% endif %}
                                             </form>
                                             <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                            <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                                            <a href="{% url 'links:edit_link' link.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-secondary">Edit</a>
                                             <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
                                         </div>
                                     </td>
