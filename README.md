@@ -52,6 +52,7 @@ Important variables:
 - `CSRF_TRUSTED_ORIGINS`: comma-separated full origins such as `https://example.com`
 - `DATABASE_URL`: PostgreSQL connection string for local non-Docker runs
 - `TEST_DATABASE_URL`: optional separate test database
+- `SQLITE_FOR_DEV`: set to `True` to force SQLite for local development commands
 - `CLOUDFLARE_TURNSTILE_*` or `TURNSTILE_*`: required Turnstile site and secret keys
 - `MAILTRAP_*` or `EMAIL_*`: email backend credentials
 
@@ -85,8 +86,14 @@ cp .env.example .env
 Then edit `.env` and set at least:
 
 - `SECRET_KEY`
-- `DATABASE_URL`
+- either `DATABASE_URL` or `SQLITE_FOR_DEV=True`
 - Turnstile site and secret keys
+
+If you want the local app to ignore `DATABASE_URL` and use SQLite instead, set:
+
+```bash
+SQLITE_FOR_DEV=True
+```
 
 ### 4. Install Python dependencies
 
@@ -103,6 +110,8 @@ cd ../..
 ```
 
 ### 6. Start PostgreSQL
+
+Skip this step if you are using SQLite for local development.
 
 If you want to run only the database in Docker:
 
@@ -137,6 +146,12 @@ python manage.py tailwind start
 ```
 
 The app will be available at `http://127.0.0.1:8000`.
+
+If you use `honcho`, the bundled Procfile already forces SQLite for the local Django and Tailwind processes:
+
+```bash
+honcho start -f Procfile.tailwind
+```
 
 ## Docker Compose
 
@@ -232,6 +247,8 @@ GitHub Actions runs on pushes to `main` and on pull requests. The workflow:
 - installs dependencies
 - runs migrations
 - runs the Django test suite
+
+The GitHub Actions workflow continues to use PostgreSQL explicitly; the local `SQLITE_FOR_DEV` override is not set in CI.
 
 The workflow file is at [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 

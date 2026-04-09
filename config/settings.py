@@ -26,6 +26,7 @@ env = environ.Env(
     EMAIL_USE_TLS=(bool, True),
     EMAIL_OTP_EXPIRES_MINUTES=(int, 10),
     SERVE_MEDIA=(bool, False),
+    SQLITE_FOR_DEV=(bool, False),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -104,17 +105,21 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Use DATABASE_URL when present. This supports PostgreSQL in Docker and deployment.
 # If DATABASE_URL is missing, Django falls back to SQLite for quick local setup.
 RUNNING_TESTS = "test" in sys.argv
+SQLITE_FOR_DEV = env.bool("SQLITE_FOR_DEV", default=False)
 default_database_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
 if RUNNING_TESTS:
     # Tests default to SQLite unless TEST_DATABASE_URL is provided explicitly.
     default_database_url = f"sqlite:///{BASE_DIR / 'test_db.sqlite3'}"
 
-DATABASES = {
-    "default": env.db(
-        "TEST_DATABASE_URL" if RUNNING_TESTS else "DATABASE_URL",
-        default=default_database_url,
-    )
-}
+if SQLITE_FOR_DEV and not RUNNING_TESTS:
+    DATABASES = {"default": environ.Env.db_url_config(default_database_url)}
+else:
+    DATABASES = {
+        "default": env.db(
+            "TEST_DATABASE_URL" if RUNNING_TESTS else "DATABASE_URL",
+            default=default_database_url,
+        )
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [

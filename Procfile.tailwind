@@ -1,2 +1,2 @@
-django: python manage.py runserver
-tailwind: python manage.py tailwind start
+django: SQLITE_FOR_DEV=True python manage.py runserver
+tailwind: SQLITE_FOR_DEV=True python manage.py tailwind start
