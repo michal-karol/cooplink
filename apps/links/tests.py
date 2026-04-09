@@ -1,5 +1,9 @@
+import importlib
+import inspect
+from pathlib import Path
+
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
 from .models import Category, Link
@@ -7,21 +11,24 @@ from .models import Category, Link
 
 class LinkTests(TestCase):
     def setUp(self):
-        # Create users and shared categories before each test runs.
         self.user = User.objects.create_user(
             username="michal",
+            email="michal@example.com",
             password="CoopLink1337",
         )
         self.other_user = User.objects.create_user(
             username="other",
+            email="other@example.com",
             password="CoopLink1337",
         )
         self.category = Category.objects.create(name="Research")
         self.other_category = Category.objects.create(name="Design")
 
-    def test_logged_in_user_can_add_link(self):
-        # Log the test user and see if link can be added 
-        self.client.login(username="michal", password="CoopLink1337")
+    def login(self, username="michal", password="CoopLink1337"):
+        self.client.login(username=username, password=password)
+
+    def test_add_link_with_valid_data(self):
+        self.login()
 
         response = self.client.post(
             reverse("links:add_link"),
@@ -30,17 +37,14 @@ class LinkTests(TestCase):
                 "url": "https://www.djangoproject.com/",
                 "description": "Official Django website",
                 "category": self.category.pk,
-                "is_shared": "",
             },
         )
 
-        # form should save the new link and redirect to the library
         self.assertRedirects(response, reverse("links:library"))
         self.assertTrue(Link.objects.filter(title="Django", user=self.user).exists())
 
-    def test_logged_in_user_can_create_category(self):
-        # Log in before posting to the category page.
-        self.client.login(username="michal", password="CoopLink1337")
+    def test_create_global_category(self):
+        self.login()
 
         response = self.client.post(
             reverse("links:categories"),
@@ -50,20 +54,27 @@ class LinkTests(TestCase):
         self.assertRedirects(response, reverse("links:categories"))
         self.assertTrue(Category.objects.filter(name="Tutorials").exists())
 
-    def test_duplicate_category_name_is_rejected(self):
-        # Try to create a duplicate category using different casing.
-        self.client.login(username="michal", password="CoopLink1337")
+        add_link_response = self.client.get(reverse("links:add_link"))
+        self.assertContains(add_link_response, "Tutorials")
 
-        response = self.client.post(
+    def test_reject_duplicate_or_empty_category(self):
+        self.login()
+
+        empty_response = self.client.post(
+            reverse("links:categories"),
+            {"name": ""},
+        )
+        duplicate_response = self.client.post(
             reverse("links:categories"),
             {"name": "research"},
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "already exists")
+        self.assertEqual(empty_response.status_code, 200)
+        self.assertContains(empty_response, "This field is required.")
+        self.assertEqual(duplicate_response.status_code, 200)
+        self.assertContains(duplicate_response, "already exists")
 
-    def test_library_search_finds_matching_link(self):
-        # Create a link that should match the library search term.
+    def test_search_links_by_title_or_category(self):
         Link.objects.create(
             user=self.user,
             category=self.category,
@@ -71,15 +82,21 @@ class LinkTests(TestCase):
             url="https://docs.djangoproject.com/",
             description="Docs",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        Link.objects.create(
+            user=self.user,
+            category=self.other_category,
+            title="Design system",
+            url="https://example.com/design-system",
+            description="Design",
+        )
+        self.login()
 
-        # Search should return the matching link.
         response = self.client.get(reverse("links:library"), {"q": "django"})
 
         self.assertContains(response, "Django docs")
+        self.assertNotContains(response, "Design system")
 
-    def test_library_filter_by_category(self):
-        # Create links in two different categories.
+    def test_filter_links_by_category(self):
         Link.objects.create(
             user=self.user,
             category=self.category,
@@ -94,9 +111,8 @@ class LinkTests(TestCase):
             url="https://example.com/design",
             description="Design",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
-        # Apply the category filter using the first category id.
         response = self.client.get(
             reverse("links:library"),
             {"category": str(self.category.pk)},
@@ -105,8 +121,7 @@ class LinkTests(TestCase):
         self.assertContains(response, "Research link")
         self.assertNotContains(response, "Design link")
 
-    def test_owner_can_edit_link(self):
-        # Create a link owned by the logged-in user.
+    def test_edit_existing_link(self):
         link = Link.objects.create(
             user=self.user,
             category=self.category,
@@ -114,9 +129,8 @@ class LinkTests(TestCase):
             url="https://example.com/old",
             description="Old description",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
-        # Submit the edit form with new values, including shared status.
         response = self.client.post(
             reverse("links:edit_link", args=[link.pk]),
             {
@@ -124,19 +138,18 @@ class LinkTests(TestCase):
                 "url": "https://example.com/new",
                 "description": "Updated description",
                 "category": self.other_category.pk,
-                "is_shared": "on",
             },
         )
 
-        # Refresh the object before checking the saved values.
         self.assertRedirects(response, reverse("links:library"))
         link.refresh_from_db()
         self.assertEqual(link.title, "Updated title")
         self.assertEqual(link.category, self.other_category)
-        self.assertTrue(link.is_shared)
 
-    def test_owner_can_delete_link(self):
-        # Create a link that will be deleted.
+        library_response = self.client.get(reverse("links:library"))
+        self.assertContains(library_response, "Updated title")
+
+    def test_delete_existing_link(self):
         link = Link.objects.create(
             user=self.user,
             category=self.category,
@@ -144,16 +157,16 @@ class LinkTests(TestCase):
             url="https://example.com/delete",
             description="Delete this",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
-        # The delete POST should remove the row completely.
+        confirm_response = self.client.get(reverse("links:delete_link", args=[link.pk]))
         response = self.client.post(reverse("links:delete_link", args=[link.pk]))
 
+        self.assertEqual(confirm_response.status_code, 200)
         self.assertRedirects(response, reverse("links:library"))
         self.assertFalse(Link.objects.filter(pk=link.pk).exists())
 
-    def test_user_cannot_edit_another_users_link(self):
-        # Create a link that belongs to a different user.
+    def test_prevent_editing_another_users_link(self):
         link = Link.objects.create(
             user=self.other_user,
             category=self.category,
@@ -161,15 +174,32 @@ class LinkTests(TestCase):
             url="https://example.com/private",
             description="Private link",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
-        # The edit page should not be accessible to a non-owner.
         response = self.client.get(reverse("links:edit_link", args=[link.pk]))
 
         self.assertEqual(response.status_code, 404)
+        link.refresh_from_db()
+        self.assertEqual(link.title, "Private")
 
-    def test_owner_can_pin_and_unpin_link(self):
-        # Create one link that can be pinned and unpinned.
+    def test_open_personal_dashboard(self):
+        Link.objects.create(
+            user=self.user,
+            category=self.category,
+            title="Dashboard link",
+            url="https://example.com/dashboard",
+            description="Shown on the dashboard",
+        )
+        self.login()
+
+        response = self.client.get(reverse("links:dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "links/personal_dashboard.html")
+        self.assertContains(response, "Your important links")
+        self.assertContains(response, "Saved links")
+
+    def test_pin_link_to_dashboard(self):
         link = Link.objects.create(
             user=self.user,
             category=self.category,
@@ -177,9 +207,8 @@ class LinkTests(TestCase):
             url="https://example.com/pin",
             description="Pin test",
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
-        # First pin the link.
         response = self.client.post(
             reverse("links:toggle_pin", args=[link.pk]),
             {"next": reverse("links:dashboard")},
@@ -189,7 +218,21 @@ class LinkTests(TestCase):
         link.refresh_from_db()
         self.assertTrue(link.is_pinned)
 
-        # Then unpin the same link.
+        dashboard_response = self.client.get(reverse("links:dashboard"))
+        pinned_links = list(dashboard_response.context["pinned_links"])
+        self.assertEqual([item.pk for item in pinned_links], [link.pk])
+
+    def test_unpin_link(self):
+        link = Link.objects.create(
+            user=self.user,
+            category=self.category,
+            title="Pinned link",
+            url="https://example.com/pinned",
+            description="Pinned test",
+            is_pinned=True,
+        )
+        self.login()
+
         response = self.client.post(
             reverse("links:toggle_pin", args=[link.pk]),
             {"next": reverse("links:dashboard")},
@@ -199,28 +242,66 @@ class LinkTests(TestCase):
         link.refresh_from_db()
         self.assertFalse(link.is_pinned)
 
-    def test_user_cannot_pin_another_users_link(self):
-        # A user must not be able to pin or unpin someone else's link.
-        link = Link.objects.create(
-            user=self.other_user,
-            category=self.category,
-            title="Not yours",
-            url="https://example.com/not-yours",
-            description="Owned by another user",
-        )
-        self.client.login(username="michal", password="CoopLink1337")
+        dashboard_response = self.client.get(reverse("links:dashboard"))
+        self.assertEqual(list(dashboard_response.context["pinned_links"]), [])
+
+    def test_mark_link_as_shared(self):
+        self.login()
 
         response = self.client.post(
-            reverse("links:toggle_pin", args=[link.pk]),
-            {"next": reverse("links:dashboard")},
+            reverse("links:add_link"),
+            {
+                "title": "Shared resource",
+                "url": "https://example.com/shared",
+                "description": "Shared link",
+                "category": self.category.pk,
+                "is_shared": "on",
+            },
         )
 
-        self.assertEqual(response.status_code, 404)
-        link.refresh_from_db()
-        self.assertFalse(link.is_pinned)
+        self.assertRedirects(response, reverse("links:library"))
+        link = Link.objects.get(title="Shared resource", user=self.user)
+        self.assertTrue(link.is_shared)
 
-    def test_shared_link_appears_on_shared_dashboard(self):
-        # Create a shared link owned by the first user.
+        library_response = self.client.get(reverse("links:library"))
+        self.assertContains(library_response, "Shared")
+
+        self.client.logout()
+        self.login(username="other")
+        shared_response = self.client.get(reverse("links:shared_dashboard"))
+        self.assertContains(shared_response, "Shared resource")
+
+    def test_mark_link_as_private(self):
+        link = Link.objects.create(
+            user=self.user,
+            category=self.category,
+            title="Team link",
+            url="https://example.com/team",
+            description="Shared first",
+            is_shared=True,
+        )
+        self.login()
+
+        response = self.client.post(
+            reverse("links:edit_link", args=[link.pk]),
+            {
+                "title": "Team link",
+                "url": "https://example.com/team",
+                "description": "Now private",
+                "category": self.category.pk,
+            },
+        )
+
+        self.assertRedirects(response, reverse("links:library"))
+        link.refresh_from_db()
+        self.assertFalse(link.is_shared)
+
+        self.client.logout()
+        self.login(username="other")
+        shared_response = self.client.get(reverse("links:shared_dashboard"))
+        self.assertNotContains(shared_response, "Team link")
+
+    def test_view_shared_dashboard(self):
         Link.objects.create(
             user=self.user,
             category=self.category,
@@ -229,53 +310,42 @@ class LinkTests(TestCase):
             description="Shared link",
             is_shared=True,
         )
-        self.client.login(username="other", password="CoopLink1337")
+        self.login(username="other")
 
-        # Another user should be able to see it on the shared dashboard.
         response = self.client.get(reverse("links:shared_dashboard"))
 
         self.assertContains(response, "Shared resource")
+        self.assertContains(response, "Research")
         self.assertContains(response, "Shared by michal")
 
-    def test_private_link_does_not_appear_on_shared_dashboard(self):
-        # Create a private link that should stay off the shared dashboard.
+    def test_search_shared_links(self):
         Link.objects.create(
             user=self.user,
             category=self.category,
-            title="Private resource",
-            url="https://example.com/private",
-            description="Private link",
-            is_shared=False,
-        )
-        self.client.login(username="other", password="CoopLink1337")
-
-        # Another user should not see the private link.
-        response = self.client.get(reverse("links:shared_dashboard"))
-
-        self.assertNotContains(response, "Private resource")
-
-    def test_shared_dashboard_search_finds_matching_link(self):
-        # Create a shared link that should match the search query.
-        Link.objects.create(
-            user=self.user,
-            category=self.category,
-            title="Design system",
-            url="https://example.com/design-system",
-            description="Shared design system",
+            title="Django system",
+            url="https://example.com/django-system",
+            description="Shared django system",
             is_shared=True,
         )
-        self.client.login(username="other", password="CoopLink1337")
+        Link.objects.create(
+            user=self.other_user,
+            category=self.other_category,
+            title="Backend notes",
+            url="https://example.com/backend-notes",
+            description="Private to search test",
+            is_shared=True,
+        )
+        self.login()
 
-        # Search on the shared dashboard should return the matching item.
         response = self.client.get(
             reverse("links:shared_dashboard"),
-            {"q": "design"},
+            {"q": "django"},
         )
 
-        self.assertContains(response, "Design system")
+        self.assertContains(response, "Django system")
+        self.assertNotContains(response, "Backend notes")
 
-    def test_shared_dashboard_filter_by_category(self):
-        # Shared dashboard category filtering should only show matching links.
+    def test_filter_shared_links_by_category(self):
         Link.objects.create(
             user=self.user,
             category=self.category,
@@ -292,7 +362,7 @@ class LinkTests(TestCase):
             description="Design guide",
             is_shared=True,
         )
-        self.client.login(username="michal", password="CoopLink1337")
+        self.login()
 
         response = self.client.get(
             reverse("links:shared_dashboard"),
@@ -301,3 +371,64 @@ class LinkTests(TestCase):
 
         self.assertContains(response, "Research handbook")
         self.assertNotContains(response, "Design tokens")
+
+    def test_prevent_pinning_another_users_link(self):
+        link = Link.objects.create(
+            user=self.other_user,
+            category=self.category,
+            title="Not yours",
+            url="https://example.com/not-yours",
+            description="Owned by another user",
+        )
+        self.login()
+
+        response = self.client.post(
+            reverse("links:toggle_pin", args=[link.pk]),
+            {"next": reverse("links:dashboard")},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        link.refresh_from_db()
+        self.assertFalse(link.is_pinned)
+
+
+class AutomatedCycleCoverageTests(SimpleTestCase):
+    def test_cycle_suite_matches_documented_automated_cases(self):
+        expected_tests = {
+            "test_register_new_user",
+            "test_login_with_valid_credentials",
+            "test_update_profile_details",
+            "test_change_password",
+            "test_add_link_with_valid_data",
+            "test_create_global_category",
+            "test_reject_duplicate_or_empty_category",
+            "test_search_links_by_title_or_category",
+            "test_filter_links_by_category",
+            "test_edit_existing_link",
+            "test_delete_existing_link",
+            "test_prevent_editing_another_users_link",
+            "test_open_personal_dashboard",
+            "test_pin_link_to_dashboard",
+            "test_unpin_link",
+            "test_mark_link_as_shared",
+            "test_mark_link_as_private",
+            "test_view_shared_dashboard",
+            "test_search_shared_links",
+            "test_filter_shared_links_by_category",
+            "test_prevent_pinning_another_users_link",
+        }
+
+        discovered_tests = set()
+        for module_name in ("apps.accounts.tests", "apps.links.tests"):
+            module = importlib.import_module(module_name)
+            for _, obj in inspect.getmembers(module, inspect.isclass):
+                if not issubclass(obj, SimpleTestCase) or obj.__module__ != module_name:
+                    continue
+                if obj.__name__ == "AutomatedCycleCoverageTests":
+                    continue
+
+                for method_name, _ in inspect.getmembers(obj, inspect.isfunction):
+                    if method_name.startswith("test_"):
+                        discovered_tests.add(method_name)
+
+        self.assertEqual(discovered_tests, expected_tests)
