@@ -66,7 +66,7 @@ def shared_dashboard(request):
     if selected_category.isdigit():
         links = links.filter(category_id=selected_category)
 
-    paginator = Paginator(links, 8)
+    paginator = Paginator(links, 12)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -101,7 +101,7 @@ def library_view(request):
     if view_mode not in {"cards", "list"}:
         view_mode = "cards"
 
-    paginator = Paginator(links, 6)
+    paginator = Paginator(links, 12)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 

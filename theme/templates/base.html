@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" referrerpolicy="no-referrer">
+    <script src="https://cdn.jsdelivr.net/npm/jdenticon@3.3.0/dist/jdenticon.min.js" defer></script>
     <script>
         window.cooplinkTheme = (function () {
             var storageKey = "cooplink-theme";
@@ -96,12 +97,64 @@
                     <a href="{% url 'links:library' %}" class="btn btn-ghost">Library</a>
                     <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost">Shared</a>
                     <a href="{% url 'links:categories' %}" class="btn btn-ghost">Categories</a>
-                    <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Profile</a>
                     <div class="mx-1 h-6 w-px bg-base-300"></div>
-                    <form method="post" action="{% url 'accounts:logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Logout</button>
-                    </form>
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost gap-2 px-2" aria-label="User menu">
+                            <svg
+                                class="size-8 shrink-0 rounded-full border border-base-300 bg-base-100"
+                                width="32"
+                                height="32"
+                                data-jdenticon-value="{{ request.user.email|default:request.user.username }}"
+                                aria-hidden="true"
+                            ></svg>
+                            <span class="hidden xl:inline text-sm font-medium">
+                                {{ request.user.get_full_name|default:request.user.email|default:request.user.username }}
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-xs opacity-70" aria-hidden="true"></i>
+                        </label>
+
+                        <div tabindex="0" class="dropdown-content z-[100] mt-2 w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-base-300 bg-base-100 shadow-xl">
+                            <div class="px-4 py-4 text-center">
+                                <svg
+                                    class="mx-auto size-12 rounded-full border border-base-300 bg-base-200"
+                                    width="48"
+                                    height="48"
+                                    data-jdenticon-value="{{ request.user.email|default:request.user.username }}"
+                                    aria-hidden="true"
+                                ></svg>
+                                <div class="mt-2 text-lg font-medium leading-tight">
+                                    {{ request.user.get_full_name|default:request.user.email|default:request.user.username }}
+                                </div>
+                                <a href="{% url 'accounts:profile' %}" class="mt-1 inline-block text-sm text-primary hover:underline">
+                                    My Profile
+                                </a>
+                            </div>
+
+                            <div class="border-t border-base-200">
+                                {% if request.user.is_staff %}
+                                    <a href="{% url 'admin:index' %}" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-base-200/60">
+                                        <i class="fa-solid fa-arrow-up-right-from-square size-5 text-primary" aria-hidden="true"></i>
+                                        <span>CoopLink Administration</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'admin:login' %}?next={% url 'admin:index' %}" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-base-200/60">
+                                        <i class="fa-solid fa-arrow-up-right-from-square size-5 text-primary" aria-hidden="true"></i>
+                                        <span>Login as admin</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="border-t border-base-200">
+                                <form method="post" action="{% url 'accounts:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="flex w-full items-center gap-3 px-4 py-3 text-left text-sm hover:bg-base-200/60">
+                                        <i class="fa-solid fa-right-from-bracket size-5 text-primary" aria-hidden="true"></i>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% else %}
                 <div class="flex-none flex items-center gap-2">
