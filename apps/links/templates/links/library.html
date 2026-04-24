@@ -64,50 +64,32 @@
         {% if view_mode == "cards" %}
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for link in page_obj %}
-                    <article class="card bg-base-100 shadow border border-base-200 hover:shadow-lg transition-shadow">
-                        <div class="card-body">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <h2 class="card-title">{{ link.title }}</h2>
-                                    <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
-                                        {{ link.url|display_url }}
-                                    </a>
+                    <article class="hover-3d link-card w-full cursor-pointer">
+                        <div class="card link-card-surface relative bg-base-100 shadow border border-base-200">
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
+                            <div class="card-body relative z-10 pb-16">
+                                <div class="flex items-start justify-between gap-4">
+                                    <h2 class="card-title link-card-title">{{ link.title }}</h2>
+
+                                    <div class="flex shrink-0 flex-col items-end gap-2">
+                                        {% if link.category %}
+                                            <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
+                                        {% else %}
+                                            <div class="badge badge-ghost">Uncategorised</div>
+                                        {% endif %}
+
+                                        {% if link.is_shared %}
+                                            <div class="badge badge-secondary badge-outline">Shared</div>
+                                        {% else %}
+                                            <div class="badge badge-ghost">Private</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-
-                                <div class="flex flex-col items-end gap-2">
-                                    {% if link.category %}
-                                        <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
-                                    {% else %}
-                                        <div class="badge badge-ghost">Uncategorised</div>
-                                    {% endif %}
-
-                                    {% if link.is_shared %}
-                                        <div class="badge badge-secondary badge-outline">Shared</div>
-                                    {% else %}
-                                        <div class="badge badge-ghost">Private</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            {% if link.description %}
-                                <p class="text-base-content/80">{{ link.description }}</p>
-                            {% endif %}
-
-                            <div class="card-actions justify-end">
-                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{% url 'links:library' %}">
-                                    {% if link.is_pinned %}
-                                        <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
-                                    {% else %}
-                                        <button type="submit" class="btn btn-sm btn-warning">Pin</button>
-                                    {% endif %}
-                                </form>
-                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                <a href="{% url 'links:edit_link' link.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-secondary">Edit</a>
-                                <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
                             </div>
                         </div>
+                        {% include "includes/hover_3d_zones.html" %}
+                        {% url 'links:library' as library_url %}
+                        {% include "includes/link_card_actions.html" with link=link show_pin=1 next_url=library_url show_edit=1 edit_next_url=request.get_full_path show_delete=1 %}
                     </article>
                 {% endfor %}
             </div>
@@ -127,7 +109,11 @@
                         <tbody>
                             {% for link in page_obj %}
                                 <tr>
-                                    <td>{{ link.title }}</td>
+                                    <td>
+                                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                                            {{ link.title }}
+                                        </a>
+                                    </td>
                                     <td>
                                         {% if link.category %}
                                             <span class="badge badge-secondary badge-outline">{{ link.category.name }}</span>
@@ -143,7 +129,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
+                                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" title="{{ link.url }}" class="link link-primary">
                                             {{ link.url|display_url }}
                                         </a>
                                     </td>
@@ -153,14 +139,21 @@
                                                 {% csrf_token %}
                                                 <input type="hidden" name="next" value="{% url 'links:library' %}">
                                                 {% if link.is_pinned %}
-                                                    <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline" aria-label="Unpin {{ link.title }}" title="Unpin">
+                                                        <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
+                                                    </button>
                                                 {% else %}
-                                                    <button type="submit" class="btn btn-sm btn-warning">Pin</button>
+                                                    <button type="submit" class="btn btn-sm btn-warning" aria-label="Pin {{ link.title }}" title="Pin">
+                                                        <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
+                                                    </button>
                                                 {% endif %}
                                             </form>
-                                            <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                            <a href="{% url 'links:edit_link' link.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-secondary">Edit</a>
-                                            <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline">Delete</a>
+                                            <a href="{% url 'links:edit_link' link.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-secondary" aria-label="Edit {{ link.title }}" title="Edit">
+                                                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline" aria-label="Delete {{ link.title }}" title="Delete">
+                                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

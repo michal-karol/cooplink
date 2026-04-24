@@ -46,43 +46,28 @@
         {% if pinned_links %}
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for link in pinned_links %}
-                    <article class="card bg-base-100 shadow border border-base-200">
-                        <div class="card-body">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <h3 class="card-title">{{ link.title }}</h3>
-                                    <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
-                                        {{ link.url|display_url }}
-                                    </a>
+                    <article class="hover-3d link-card w-full cursor-pointer">
+                        <div class="card link-card-surface relative bg-base-100 shadow border border-base-200">
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
+                            <div class="card-body relative z-10 pb-16">
+                                <div class="flex items-start justify-between gap-4">
+                                    <h3 class="card-title link-card-title">{{ link.title }}</h3>
+                                    <div class="flex shrink-0 flex-col items-end gap-2">
+                                        {% if link.is_shared %}
+                                            <div class="badge badge-secondary badge-outline">Shared</div>
+                                        {% else %}
+                                            <div class="badge badge-ghost">Private</div>
+                                        {% endif %}
+                                        {% if link.category %}
+                                            <div class="badge badge-outline">{{ link.category.name }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="flex flex-col items-end gap-2">
-                                    <div class="badge badge-warning">Pinned</div>
-                                    {% if link.is_shared %}
-                                        <div class="badge badge-secondary badge-outline">Shared</div>
-                                    {% else %}
-                                        <div class="badge badge-ghost">Private</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            {% if link.category %}
-                                <div class="badge badge-outline w-fit">{{ link.category.name }}</div>
-                            {% endif %}
-
-                            {% if link.description %}
-                                <p class="text-base-content/80">{{ link.description }}</p>
-                            {% endif %}
-
-                            <div class="card-actions justify-end">
-                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{% url 'links:dashboard' %}">
-                                    <button type="submit" class="btn btn-sm btn-outline">Unpin</button>
-                                </form>
-                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                             </div>
                         </div>
+                        {% include "includes/hover_3d_zones.html" %}
+                        {% url 'links:dashboard' as dashboard_url %}
+                        {% include "includes/link_card_actions.html" with link=link show_pin=1 next_url=dashboard_url show_edit=1 %}
                     </article>
                 {% endfor %}
             </div>
@@ -110,36 +95,28 @@
         {% if recent_links %}
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for link in recent_links %}
-                    <article class="card bg-base-100 shadow border border-base-200">
-                        <div class="card-body">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <h3 class="card-title">{{ link.title }}</h3>
-                                    <a href="{{ link.url }}" target="_blank" title="{{ link.url }}" class="link link-primary">
-                                        {{ link.url|display_url }}
-                                    </a>
+                    <article class="hover-3d link-card w-full cursor-pointer">
+                        <div class="card link-card-surface relative bg-base-100 shadow border border-base-200">
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
+                            <div class="card-body relative z-10 pb-16">
+                                <div class="flex items-start justify-between gap-4">
+                                    <h3 class="card-title link-card-title">{{ link.title }}</h3>
+                                    <div class="flex shrink-0 flex-col items-end gap-2">
+                                        {% if link.is_shared %}
+                                            <div class="badge badge-secondary badge-outline">Shared</div>
+                                        {% else %}
+                                            <div class="badge badge-ghost">Private</div>
+                                        {% endif %}
+                                        {% if link.category %}
+                                            <div class="badge badge-outline">{{ link.category.name }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {% if link.is_shared %}
-                                    <div class="badge badge-secondary badge-outline">Shared</div>
-                                {% else %}
-                                    <div class="badge badge-ghost">Private</div>
-                                {% endif %}
-                            </div>
-
-                            {% if link.category %}
-                                <div class="badge badge-outline w-fit">{{ link.category.name }}</div>
-                            {% endif %}
-
-                            <div class="card-actions justify-end">
-                                <form method="post" action="{% url 'links:toggle_pin' link.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{% url 'links:dashboard' %}">
-                                    <button type="submit" class="btn btn-sm btn-warning">Pin</button>
-                                </form>
-                                <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline">Open</a>
-                                <a href="{% url 'links:edit_link' link.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                             </div>
                         </div>
+                        {% include "includes/hover_3d_zones.html" %}
+                        {% url 'links:dashboard' as dashboard_url %}
+                        {% include "includes/link_card_actions.html" with link=link show_pin=1 next_url=dashboard_url show_edit=1 %}
                     </article>
                 {% endfor %}
             </div>

@@ -1,0 +1,37 @@
+<div class="link-card-actions flex items-end justify-end gap-2 p-4">
+    {% if link.description %}
+        <div class="tooltip tooltip-left pointer-events-auto" data-tip="{{ link.description }}">
+            <button type="button" class="btn btn-sm btn-info btn-outline" aria-label="Description for {{ link.title }}" title="Description">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if show_pin %}
+        <form method="post" action="{% url 'links:toggle_pin' link.pk %}" class="pointer-events-auto">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next_url }}">
+            {% if link.is_pinned %}
+                <button type="submit" class="btn btn-sm btn-outline" aria-label="Unpin {{ link.title }}" title="Unpin">
+                    <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
+                </button>
+            {% else %}
+                <button type="submit" class="btn btn-sm btn-warning" aria-label="Pin {{ link.title }}" title="Pin">
+                    <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
+                </button>
+            {% endif %}
+        </form>
+    {% endif %}
+
+    {% if show_edit %}
+        <a href="{% url 'links:edit_link' link.pk %}{% if edit_next_url %}?next={{ edit_next_url|urlencode }}{% endif %}" class="btn btn-sm btn-secondary pointer-events-auto" aria-label="Edit {{ link.title }}" title="Edit">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+        </a>
+    {% endif %}
+
+    {% if show_delete %}
+        <a href="{% url 'links:delete_link' link.pk %}" class="btn btn-sm btn-error btn-outline pointer-events-auto" aria-label="Delete {{ link.title }}" title="Delete">
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+        </a>
+    {% endif %}
+</div>

@@ -1,17 +1,70 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"{% if cooplink_theme %} data-theme="{{ cooplink_theme }}"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CoopLink{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'img/cooplink_icon.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" referrerpolicy="no-referrer">
+    <script>
+        window.cooplinkTheme = (function () {
+            var storageKey = "cooplink-theme";
+            var lightTheme = "light";
+            var alternateTheme = "graphite";
+            var serverTheme = "{{ cooplink_theme|default:'' }}";
+            var theme = serverTheme || lightTheme;
+            var shouldPersistTheme = Boolean(serverTheme);
+
+            function persistTheme(theme) {
+                localStorage.setItem(storageKey, theme);
+                document.cookie = storageKey + "=" + theme + "; max-age=31536000; path=/; samesite=lax";
+            }
+
+            try {
+                var savedTheme = localStorage.getItem(storageKey);
+                if (savedTheme === "synthwave" || savedTheme === "dark") {
+                    savedTheme = alternateTheme;
+                    shouldPersistTheme = true;
+                }
+
+                if (savedTheme === lightTheme || savedTheme === alternateTheme) {
+                    theme = savedTheme;
+                    shouldPersistTheme = true;
+                } else if (!serverTheme && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    theme = alternateTheme;
+                }
+            } catch (error) {}
+
+            document.documentElement.setAttribute("data-theme", theme);
+
+            if (shouldPersistTheme) {
+                try {
+                    persistTheme(theme);
+                } catch (error) {}
+            }
+
+            return {
+                theme: theme,
+                storageKey: storageKey,
+                lightTheme: lightTheme,
+                alternateTheme: alternateTheme,
+            };
+        })();
+    </script>
     {% tailwind_css %}
 </head>
 <body class="min-h-screen bg-base-200 text-base-content">
-    <div class="min-h-screen bg-gradient-to-br from-base-200 via-base-200 to-primary/10">
+    <div class="app-shell flex min-h-screen flex-col">
         <nav class="navbar bg-base-100/90 backdrop-blur border-b border-base-300 px-4 sm:px-6">
             <div class="flex-1">
-                <a href="{% url 'links:home' %}" class="btn btn-ghost text-xl normal-case">CoopLink</a>
+                <a href="{% url 'links:home' %}" class="btn btn-ghost gap-2 text-xl normal-case">
+                    <img src="{% static 'img/cooplink_icon.png' %}" alt="" width="32" height="32" class="h-8 w-8">
+                    <span class="bg-gradient-to-r from-[#1268dd] via-[#2f8fff] to-[#27cfc4] bg-clip-text text-transparent">CoopLink</span>
+                </a>
             </div>
 
             {% if request.user.is_authenticated %}
@@ -58,7 +111,7 @@
             {% endif %}
         </nav>
 
-        <main class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+        <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-10">
             {% if messages %}
                 <div class="space-y-3 mb-6">
                     {% for message in messages %}
@@ -72,11 +125,62 @@
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="footer footer-center p-6 text-base-content/60">
-            <aside>
-                <p>CoopLink helps you save, organise, and share useful links.</p>
+        <footer class="app-footer grid gap-8 border-t p-10 sm:grid-cols-[1fr_auto_1fr] sm:items-start">
+            <aside class="grid gap-2">
+                <img src="{% static 'img/cooplink_icon.png' %}" alt="" width="50" height="50" class="h-12 w-12">
+                <p>
+                    <span class="font-bold">CoopLink</span>
+                    <br>
+                    Helps you save, organise, and share useful links.
+                </p>
             </aside>
+            <p class="app-footer-muted flex items-center justify-center gap-2 self-center text-center text-sm">
+                <i class="fa-regular fa-copyright" aria-hidden="true"></i>
+                <span>Copyright © 2026 Michal Slotwinski. All rights reserved.</span>
+            </p>
+            <nav class="grid justify-start gap-3 sm:justify-end">
+                <h6 class="footer-title">Theme</h6>
+                <label class="app-footer-toggle toggle">
+                    <input type="checkbox" value="graphite" class="theme-controller" aria-label="Toggle dark theme"{% if cooplink_theme_is_graphite %} checked{% endif %}>
+
+                    <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></g></svg>
+
+                    <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></g></svg>
+                </label>
+            </nav>
         </footer>
     </div>
+    <script>
+        (function () {
+            var themeSettings = window.cooplinkTheme;
+            var storageKey = themeSettings.storageKey;
+            var lightTheme = themeSettings.lightTheme;
+            var alternateTheme = themeSettings.alternateTheme;
+            var themeToggle = document.querySelector('.theme-controller[value="graphite"]');
+
+            if (!themeToggle) {
+                return;
+            }
+
+            function applyTheme(theme, shouldPersist) {
+                document.documentElement.setAttribute("data-theme", theme);
+                themeToggle.checked = theme === alternateTheme;
+                themeSettings.theme = theme;
+
+                if (shouldPersist) {
+                    try {
+                        localStorage.setItem(storageKey, theme);
+                        document.cookie = storageKey + "=" + theme + "; max-age=31536000; path=/; samesite=lax";
+                    } catch (error) {}
+                }
+            }
+
+            applyTheme(themeSettings.theme, false);
+
+            themeToggle.addEventListener("change", function () {
+                applyTheme(themeToggle.checked ? alternateTheme : lightTheme, true);
+            });
+        })();
+    </script>
 </body>
 </html>

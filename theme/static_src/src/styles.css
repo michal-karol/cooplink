@@ -1,5 +1,79 @@
 @import "tailwindcss";
-@plugin "daisyui";
+
+@theme {
+  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
+}
+
+@plugin "daisyui" {
+  themes: false;
+}
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: oklch(96% 0.014 220);
+  --color-base-200: oklch(92% 0.018 220);
+  --color-base-300: oklch(86% 0.022 220);
+  --color-base-content: oklch(24% 0.022 235);
+  --color-primary: oklch(56% 0.18 255);
+  --color-primary-content: oklch(98% 0.012 220);
+  --color-secondary: oklch(62% 0.13 188);
+  --color-secondary-content: oklch(98% 0.012 190);
+  --color-accent: oklch(70% 0.12 175);
+  --color-accent-content: oklch(20% 0.03 190);
+  --color-neutral: oklch(28% 0.026 235);
+  --color-neutral-content: oklch(96% 0.014 220);
+  --color-info: oklch(62% 0.14 235);
+  --color-info-content: oklch(98% 0.012 235);
+  --color-success: oklch(58% 0.13 155);
+  --color-success-content: oklch(98% 0.012 155);
+  --color-warning: oklch(72% 0.13 80);
+  --color-warning-content: oklch(23% 0.035 80);
+  --color-error: oklch(58% 0.17 25);
+  --color-error-content: oklch(98% 0.012 25);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+@plugin "daisyui/theme" {
+  name: "graphite";
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: oklch(22% 0.006 255);
+  --color-base-200: oklch(18% 0.005 255);
+  --color-base-300: oklch(28% 0.006 255);
+  --color-base-content: oklch(93% 0.006 255);
+  --color-primary: oklch(70% 0.105 190);
+  --color-primary-content: oklch(17% 0.025 205);
+  --color-secondary: oklch(74% 0.09 150);
+  --color-secondary-content: oklch(17% 0.022 150);
+  --color-accent: oklch(78% 0.12 75);
+  --color-accent-content: oklch(20% 0.035 75);
+  --color-neutral: oklch(13% 0.004 255);
+  --color-neutral-content: oklch(92% 0.004 255);
+  --color-info: oklch(72% 0.12 220);
+  --color-info-content: oklch(17% 0.028 220);
+  --color-success: oklch(72% 0.12 150);
+  --color-success-content: oklch(18% 0.026 150);
+  --color-warning: oklch(78% 0.13 80);
+  --color-warning-content: oklch(22% 0.035 80);
+  --color-error: oklch(67% 0.16 25);
+  --color-error-content: oklch(96% 0.018 25);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
@@ -9,3 +83,69 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+@layer components {
+  .app-shell {
+    background:
+      linear-gradient(135deg,
+        var(--color-base-200) 0%,
+        var(--color-base-200) 58%,
+        color-mix(in oklab, var(--color-secondary) 12%, var(--color-base-200)) 100%);
+  }
+
+  [data-theme="graphite"] .app-shell {
+    background: var(--color-base-200);
+  }
+
+  .app-footer {
+    background: var(--color-neutral);
+    border-color: var(--color-neutral);
+    color: var(--color-neutral-content);
+  }
+
+  .app-footer-muted {
+    color: color-mix(in oklab, var(--color-neutral-content) 70%, transparent);
+  }
+
+  .app-footer-toggle {
+    color: var(--color-neutral-content);
+  }
+
+  [data-theme="graphite"] .app-footer {
+    background: var(--color-base-100);
+    border-color: var(--color-base-300);
+    color: var(--color-base-content);
+  }
+
+  [data-theme="graphite"] .app-footer-muted {
+    color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+  }
+
+  [data-theme="graphite"] .app-footer-toggle {
+    color: var(--color-base-content);
+  }
+
+  .link-card {
+    min-height: 11rem;
+  }
+
+  .link-card-surface {
+    height: 11rem;
+  }
+
+  .link-card-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .link-card-actions {
+    grid-area: 1 / 1 / 4 / 4;
+    justify-self: stretch;
+    align-self: end;
+    pointer-events: none;
+    scale: 1 !important;
+    z-index: 20 !important;
+  }
+}
