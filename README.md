@@ -16,24 +16,53 @@ CoopLink is a Django app for collecting, organising, and sharing useful links. U
 
 ## Prerequisites
 
-For local development without Docker:
-
 - Python 
 - Node.js and npm
 - PostgreSQL
-
-For the containerized workflow:
-
 - Docker
 - Docker Compose
 
-## Environment Variables
+## Quick Local Setup
 
-Copy the example file and adjust values as needed:
+ Run CoopLink locally with SQLite. You do not need Docker, Docker Compose, PostgreSQL, or Kubernetes for this path.
+
+Setup:
 
 ```bash
-cp .env.example .env
+cd cooplink
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
+
+Migrate and create new user: 
+
+```bash
+SQLITE_FOR_DEV=True python manage.py migrate
+SQLITE_FOR_DEV=True python manage.py createsuperuser
+```
+
+Start the app: 
+
+```bash
+honcho start -f Procfile.tailwind
+```
+
+The app will be available at `http://127.0.0.1:8000`.
+
+## Project Structure
+
+```text
+apps/
+  accounts/    Authentication, profile, OTP, password reset
+  links/       Link library, dashboards, categories
+config/        Django settings and root URLs
+theme/         Tailwind and shared templates
+compose.yaml   Local container orchestration
+Dockerfile     Web image build
+```
+
+## Environment Variables
 
 Important variables:
 
@@ -46,11 +75,6 @@ Important variables:
 - `SQLITE_FOR_DEV`: set to `True` to force SQLite for local development commands
 - `CLOUDFLARE_TURNSTILE_*` or `TURNSTILE_*`: required Turnstile site and secret keys
 - `MAILTRAP_*` or `EMAIL_*`: email backend credentials
-
-Notes:
-
-- In Docker Compose, `DATABASE_URL` is overridden for the `web` container to use the `db` service.
-- `.env` is excluded from the Docker build context, so secrets are not baked into the image.
 
 ## Local Development
 
@@ -102,9 +126,6 @@ cd ../..
 
 ### 6. Start PostgreSQL
 
-Skip this step if you are using SQLite for local development.
-
-If you want to run only the database in Docker:
 
 ```bash
 docker compose up -d db
@@ -138,11 +159,6 @@ python manage.py tailwind start
 
 The app will be available at `http://127.0.0.1:8000`.
 
-If you use `honcho`, the bundled Procfile already forces SQLite for the local Django and Tailwind processes:
-
-```bash
-honcho start -f Procfile.tailwind
-```
 
 ## Docker Compose
 
@@ -194,14 +210,3 @@ kubectl get pods
 kubectl get svc
 ```
 
-## Project Structure
-
-```text
-apps/
-  accounts/    Authentication, profile, OTP, password reset
-  links/       Link library, dashboards, categories
-config/        Django settings and root URLs
-theme/         Tailwind and shared templates
-compose.yaml   Local container orchestration
-Dockerfile     Web image build
-```
