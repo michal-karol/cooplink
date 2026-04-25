@@ -1877,10 +1877,10 @@
   .z-10 {
     z-index: 10;
   }
-  .z-\[1000\] {
+  .z-1000 {
     z-index: 1000;
   }
-  .z-\[1100\] {
+  .z-1100 {
     z-index: 1100;
   }
   @layer daisyui.l1.l2.l3 {
@@ -2673,6 +2673,17 @@
     .bg-secondary\/10 {
       background-color: color-mix(in oklab, var(--color-secondary) 10%, transparent);
     }
+  }
+  .bg-linear-to-r {
+    --tw-gradient-position: to right;
+  }
+  @supports (background-image: linear-gradient(in lab, red, red)) {
+    .bg-linear-to-r {
+      --tw-gradient-position: to right in oklab;
+    }
+  }
+  .bg-linear-to-r {
+    background-image: linear-gradient(var(--tw-gradient-stops));
   }
   .bg-gradient-to-r {
     --tw-gradient-position: to right in oklab;
