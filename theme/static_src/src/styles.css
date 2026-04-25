@@ -42,29 +42,29 @@
   --noise: 0;
 }
 @plugin "daisyui/theme" {
-  name: "graphite";
+  name: "dracula";
   prefersdark: true;
   color-scheme: dark;
-  --color-base-100: oklch(22% 0.006 255);
-  --color-base-200: oklch(18% 0.005 255);
-  --color-base-300: oklch(28% 0.006 255);
-  --color-base-content: oklch(93% 0.006 255);
-  --color-primary: oklch(70% 0.105 190);
-  --color-primary-content: oklch(17% 0.025 205);
-  --color-secondary: oklch(74% 0.09 150);
-  --color-secondary-content: oklch(17% 0.022 150);
-  --color-accent: oklch(78% 0.12 75);
-  --color-accent-content: oklch(20% 0.035 75);
-  --color-neutral: oklch(13% 0.004 255);
-  --color-neutral-content: oklch(92% 0.004 255);
-  --color-info: oklch(72% 0.12 220);
-  --color-info-content: oklch(17% 0.028 220);
-  --color-success: oklch(72% 0.12 150);
-  --color-success-content: oklch(18% 0.026 150);
-  --color-warning: oklch(78% 0.13 80);
-  --color-warning-content: oklch(22% 0.035 80);
-  --color-error: oklch(67% 0.16 25);
-  --color-error-content: oklch(96% 0.018 25);
+  --color-base-100: #282a36;
+  --color-base-200: #21222c;
+  --color-base-300: #44475a;
+  --color-base-content: #f8f8f2;
+  --color-primary: #bd93f9;
+  --color-primary-content: #1f1630;
+  --color-secondary: #8be9fd;
+  --color-secondary-content: #102a30;
+  --color-accent: #ff79c6;
+  --color-accent-content: #321223;
+  --color-neutral: #191a21;
+  --color-neutral-content: #f8f8f2;
+  --color-info: #8be9fd;
+  --color-info-content: #102a30;
+  --color-success: #50fa7b;
+  --color-success-content: #0f2d17;
+  --color-warning: #f1fa8c;
+  --color-warning-content: #303117;
+  --color-error: #ff5555;
+  --color-error-content: #2f1111;
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
@@ -93,8 +93,12 @@
         color-mix(in oklab, var(--color-secondary) 12%, var(--color-base-200)) 100%);
   }
 
-  [data-theme="graphite"] .app-shell {
-    background: var(--color-base-200);
+  [data-theme="dracula"] .app-shell {
+    background:
+      linear-gradient(135deg,
+        var(--color-base-200) 0%,
+        var(--color-base-200) 60%,
+        color-mix(in oklab, var(--color-primary) 10%, var(--color-base-200)) 100%);
   }
 
   .app-footer {
@@ -111,17 +115,17 @@
     color: var(--color-neutral-content);
   }
 
-  [data-theme="graphite"] .app-footer {
+  [data-theme="dracula"] .app-footer {
     background: var(--color-base-100);
     border-color: var(--color-base-300);
     color: var(--color-base-content);
   }
 
-  [data-theme="graphite"] .app-footer-muted {
+  [data-theme="dracula"] .app-footer-muted {
     color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
   }
 
-  [data-theme="graphite"] .app-footer-toggle {
+  [data-theme="dracula"] .app-footer-toggle {
     color: var(--color-base-content);
   }
 
@@ -138,6 +142,24 @@
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+  }
+
+  .link-pill-category {
+    border-color: color-mix(in oklab, var(--color-primary) 42%, transparent);
+    background-color: color-mix(in oklab, var(--color-primary) 12%, var(--color-base-100));
+    color: color-mix(in oklab, var(--color-primary) 74%, var(--color-base-content));
+  }
+
+  .link-pill-shared {
+    border-color: color-mix(in oklab, var(--color-secondary) 42%, transparent);
+    background-color: color-mix(in oklab, var(--color-secondary) 12%, var(--color-base-100));
+    color: color-mix(in oklab, var(--color-secondary) 72%, var(--color-base-content));
+  }
+
+  .link-pill-private {
+    border-color: color-mix(in oklab, var(--color-base-content) 18%, transparent);
+    background-color: color-mix(in oklab, var(--color-base-content) 7%, var(--color-base-100));
+    color: color-mix(in oklab, var(--color-base-content) 64%, transparent);
   }
 
   .link-card-actions {

@@ -49,11 +49,11 @@
                                     {% include "includes/link_card_favicon.html" with link=link %}
                                 </div>
                                 <div class="flex shrink-0 flex-col items-end gap-2">
-                                    <div class="badge badge-secondary">Shared</div>
+                                    <div class="badge link-pill-shared">Shared</div>
                                     {% if link.category %}
-                                        <div class="badge badge-outline">{{ link.category.name }}</div>
+                                        <div class="badge link-pill-category">{{ link.category.name }}</div>
                                     {% endif %}
-                                    <div class="badge badge-ghost">Shared by {{ link.user.username }}</div>
+                                    <div class="badge link-pill-private">Shared by {{ link.user.username }}</div>
                                 </div>
                             </div>
                         </div>

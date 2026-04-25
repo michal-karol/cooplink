@@ -76,15 +76,15 @@
 
                                     <div class="flex shrink-0 flex-col items-end gap-2">
                                         {% if link.category %}
-                                            <div class="badge badge-secondary badge-outline">{{ link.category.name }}</div>
+                                            <div class="badge link-pill-category">{{ link.category.name }}</div>
                                         {% else %}
-                                            <div class="badge badge-ghost">Uncategorised</div>
+                                            <div class="badge link-pill-private">Uncategorised</div>
                                         {% endif %}
 
                                         {% if link.is_shared %}
-                                            <div class="badge badge-secondary badge-outline">Shared</div>
+                                            <div class="badge link-pill-shared">Shared</div>
                                         {% else %}
-                                            <div class="badge badge-ghost">Private</div>
+                                            <div class="badge link-pill-private">Private</div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -119,16 +119,16 @@
                                     </td>
                                     <td>
                                         {% if link.category %}
-                                            <span class="badge badge-secondary badge-outline">{{ link.category.name }}</span>
+                                            <span class="badge link-pill-category">{{ link.category.name }}</span>
                                         {% else %}
-                                            <span class="badge badge-ghost">Uncategorised</span>
+                                            <span class="badge link-pill-private">Uncategorised</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if link.is_shared %}
-                                            <span class="badge badge-secondary badge-outline">Shared</span>
+                                            <span class="badge link-pill-shared">Shared</span>
                                         {% else %}
-                                            <span class="badge badge-ghost">Private</span>
+                                            <span class="badge link-pill-private">Private</span>
                                         {% endif %}
                                     </td>
                                     <td>

@@ -1,16 +1,16 @@
-VALID_THEMES = {"light", "graphite"}
-LEGACY_DARK_THEMES = {"dark", "synthwave"}
+VALID_THEMES = {"light", "dracula"}
+LEGACY_DARK_THEMES = {"dark", "synthwave", "graphite"}
 
 
 def cooplink_theme(request):
     theme = request.COOKIES.get("cooplink-theme", "")
 
     if theme in LEGACY_DARK_THEMES:
-        theme = "graphite"
+        theme = "dracula"
     elif theme not in VALID_THEMES:
         theme = ""
 
     return {
         "cooplink_theme": theme,
-        "cooplink_theme_is_graphite": theme == "graphite",
+        "cooplink_theme_is_dracula": theme == "dracula",
     }
