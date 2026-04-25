@@ -49,7 +49,7 @@
                     <article class="hover-3d link-card w-full cursor-pointer">
                         <div class="card link-card-surface relative app-panel-soft">
                             <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
-                            <div class="card-body relative z-10 p-4">
+                            <div class="card-body pointer-events-none relative z-10 p-4">
                                 <div class="link-card-main flex min-w-0 items-center gap-4">
                                     {% include "includes/link_card_favicon.html" with link=link %}
                                     <h3 class="card-title link-card-title min-w-0">{{ link.title }}</h3>
@@ -92,7 +92,7 @@
                     <article class="hover-3d link-card w-full cursor-pointer">
                         <div class="card link-card-surface relative app-panel-soft">
                             <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
-                            <div class="card-body relative z-10 p-4">
+                            <div class="card-body pointer-events-none relative z-10 p-4">
                                 <div class="link-card-main flex min-w-0 items-center gap-4">
                                     {% include "includes/link_card_favicon.html" with link=link %}
                                     <h3 class="card-title link-card-title min-w-0">{{ link.title }}</h3>
