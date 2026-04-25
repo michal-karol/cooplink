@@ -7,7 +7,7 @@
         type="{{ input_type|default:'text' }}"
         name="{{ field_name }}"
         id="{{ field_id }}"
-        class="input input-bordered w-full"
+        class="input input-bordered bg-base-100/70 w-full"
         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
         {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
         {% if input_type != "password" %}value="{{ value|default:'' }}"{% endif %}

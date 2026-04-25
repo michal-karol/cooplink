@@ -5,11 +5,11 @@
 {% block content %}
 {% url 'links:export_links_csv' as export_links_csv_url %}
 <div class="grid gap-6">
-    <section class="card bg-base-100 shadow-xl border border-base-200">
+    <section class="card app-panel">
         <div class="card-body gap-6">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <div class="badge badge-primary badge-outline mb-3">Your library</div>
+                    <div class="app-kicker badge mb-3">Your library</div>
                     <h1 class="text-3xl font-bold">Saved links</h1>
                     <p class="text-base-content/70">Browse, search, and organise the links you have saved.</p>
                 </div>
@@ -40,7 +40,7 @@
             </form>
 
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="badge badge-outline">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</div>
+                <div class="badge link-pill-private">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</div>
 
                 <div class="join">
                     <a
@@ -65,29 +65,16 @@
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for link in page_obj %}
                     <article class="hover-3d link-card w-full cursor-pointer">
-                        <div class="card link-card-surface relative bg-base-100 shadow border border-base-200">
+                        <div class="card link-card-surface relative app-panel-soft">
                             <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
-                            <div class="card-body relative z-10 pb-16">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="grid min-w-0 gap-3">
-                                        <h2 class="card-title link-card-title">{{ link.title }}</h2>
-                                        {% include "includes/link_card_favicon.html" with link=link %}
-                                    </div>
-
-                                    <div class="flex shrink-0 flex-col items-end gap-2">
-                                        {% if link.category %}
-                                            <div class="badge link-pill-category">{{ link.category.name }}</div>
-                                        {% else %}
-                                            <div class="badge link-pill-private">Uncategorised</div>
-                                        {% endif %}
-
-                                        {% if link.is_shared %}
-                                            <div class="badge link-pill-shared">Shared</div>
-                                        {% else %}
-                                            <div class="badge link-pill-private">Private</div>
-                                        {% endif %}
-                                    </div>
+                            <div class="card-body relative z-10 p-4">
+                                <div class="link-card-main flex min-w-0 items-center gap-4">
+                                    {% include "includes/link_card_favicon.html" with link=link %}
+                                    <h2 class="card-title link-card-title min-w-0">{{ link.title }}</h2>
                                 </div>
+                                {% if link.category %}
+                                    <div class="badge link-pill-category link-card-category">{{ link.category.name }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         {% include "includes/hover_3d_zones.html" %}
@@ -97,7 +84,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="card bg-base-100 shadow border border-base-200 overflow-hidden">
+            <div class="card app-panel-soft overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="table">
                         <thead>
@@ -193,9 +180,9 @@
             </div>
         </div>
     {% else %}
-        <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card app-panel">
             <div class="card-body">
-                <div class="badge badge-outline mb-2 w-fit">No results</div>
+                <div class="app-kicker badge mb-2 w-fit">No results</div>
                 <h2 class="card-title">No matching results found</h2>
                 <p class="text-base-content/70">
                     Try a different search term, remove the category filter, or save a new link.

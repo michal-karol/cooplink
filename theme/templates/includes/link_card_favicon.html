@@ -1,4 +1,4 @@
-<div class="link-card-favicon flex h-16 w-16 items-center justify-center">
+<div class="link-card-favicon flex h-12 w-12 shrink-0 items-center justify-center">
     {% with icon_url=link.url|favicon_url %}
         {% if icon_url %}
             <img
@@ -6,7 +6,7 @@
                 alt=""
                 width="48"
                 height="48"
-                class="h-12 w-12 object-contain"
+                class="h-10 w-10 object-contain"
                 loading="lazy"
                 referrerpolicy="no-referrer"
                 onerror="this.closest('.link-card-favicon').hidden=true;"

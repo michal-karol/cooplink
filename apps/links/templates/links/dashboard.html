@@ -4,16 +4,16 @@
 
 {% block content %}
 <div class="grid gap-6">
-    <section class="card bg-base-100 shadow-xl border border-base-200">
+    <section class="card app-panel">
         <div class="card-body md:flex-row md:items-center md:justify-between">
             <div>
-                <div class="badge badge-primary badge-outline mb-3">Your library</div>
+                <div class="app-kicker badge mb-3">Your library</div>
                 <h1 class="text-3xl font-bold">Saved links</h1>
                 <p class="text-base-content/70">Welcome back, {{ request.user.username }}.</p>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="stats shadow">
+                <div class="stats border border-base-300 bg-base-100/70 shadow-sm">
                     <div class="stat px-6 py-4">
                         <div class="stat-title">Saved links</div>
                         <div class="stat-value text-primary text-3xl">{{ links|length }}</div>
@@ -28,22 +28,16 @@
         <div class="grid gap-4">
             {% for link in links %}
                 <article class="hover-3d link-card w-full cursor-pointer">
-                    <div class="card link-card-surface relative bg-base-100 shadow border border-base-200">
+                    <div class="card link-card-surface relative app-panel-soft">
                         <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ link.title }}" class="absolute inset-0 z-0"></a>
-                        <div class="card-body relative z-10 pb-16">
-                            <div class="flex items-start justify-between gap-4">
-                                <div class="grid min-w-0 gap-3">
-                                    <h2 class="card-title link-card-title">{{ link.title }}</h2>
-                                    {% include "includes/link_card_favicon.html" with link=link %}
-                                </div>
-                                <div class="shrink-0">
-                                    {% if link.category %}
-                                        <div class="badge link-pill-category">{{ link.category.name }}</div>
-                                    {% else %}
-                                        <div class="badge link-pill-private">Uncategorised</div>
-                                    {% endif %}
-                                </div>
+                        <div class="card-body relative z-10 p-4">
+                            <div class="link-card-main flex min-w-0 items-center gap-4">
+                                {% include "includes/link_card_favicon.html" with link=link %}
+                                <h2 class="card-title link-card-title min-w-0">{{ link.title }}</h2>
                             </div>
+                            {% if link.category %}
+                                <div class="badge link-pill-category link-card-category">{{ link.category.name }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     {% include "includes/hover_3d_zones.html" %}
@@ -52,9 +46,9 @@
             {% endfor %}
         </div>
 {% else %}
-    <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card app-panel">
         <div class="card-body">
-            <div class="badge badge-outline mb-2 w-fit">Empty state</div>
+            <div class="app-kicker badge mb-2 w-fit">Empty state</div>
             <h2 class="card-title">Nothing saved yet</h2>
             <p class="text-base-content/70">Start your library by saving the first link you want to keep.</p>
             <div class="card-actions justify-end">
@@ -63,4 +57,5 @@
         </div>
     </div>
 {% endif %}
+</div>
 {% endblock %}

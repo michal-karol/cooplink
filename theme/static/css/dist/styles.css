@@ -2346,14 +2346,14 @@
   .h-8 {
     height: calc(var(--spacing) * 8);
   }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
+  }
   .h-11 {
     height: calc(var(--spacing) * 11);
   }
   .h-12 {
     height: calc(var(--spacing) * 12);
-  }
-  .h-16 {
-    height: calc(var(--spacing) * 16);
   }
   .h-full {
     height: 100%;
@@ -2364,20 +2364,23 @@
   .min-h-screen {
     min-height: 100vh;
   }
+  .w-4 {
+    width: calc(var(--spacing) * 4);
+  }
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
   .w-8 {
     width: calc(var(--spacing) * 8);
   }
+  .w-10 {
+    width: calc(var(--spacing) * 10);
+  }
   .w-11 {
     width: calc(var(--spacing) * 11);
   }
   .w-12 {
     width: calc(var(--spacing) * 12);
-  }
-  .w-16 {
-    width: calc(var(--spacing) * 16);
   }
   .w-56 {
     width: calc(var(--spacing) * 56);
@@ -2471,6 +2474,9 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
+  .place-items-center {
+    place-items: center;
+  }
   .items-center {
     align-items: center;
   }
@@ -2558,26 +2564,18 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
   }
-  @layer daisyui.l1.l2 {
-    .badge-outline {
-      color: var(--badge-color);
-      --badge-bg: #0000;
-      background-image: none;
-      border-color: currentColor;
-    }
-  }
   .border-base-200 {
     border-color: var(--color-base-200);
   }
   .border-base-300 {
     border-color: var(--color-base-300);
   }
-  .border-error\/20 {
+  .border-error\/30 {
     border-color: var(--color-error);
   }
   @supports (color: color-mix(in lab, red, red)) {
-    .border-error\/20 {
-      border-color: color-mix(in oklab, var(--color-error) 20%, transparent);
+    .border-error\/30 {
+      border-color: color-mix(in oklab, var(--color-error) 30%, transparent);
     }
   }
   .border-primary\/30 {
@@ -2649,6 +2647,14 @@
       background-color: color-mix(in oklab, var(--color-base-300) 40%, transparent);
     }
   }
+  .bg-error\/10 {
+    background-color: var(--color-error);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-error\/10 {
+      background-color: color-mix(in oklab, var(--color-error) 10%, transparent);
+    }
+  }
   .bg-primary\/10 {
     background-color: var(--color-primary);
   }
@@ -2691,6 +2697,9 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
@@ -2729,9 +2738,6 @@
   }
   .pt-10 {
     padding-top: calc(var(--spacing) * 10);
-  }
-  .pb-16 {
-    padding-bottom: calc(var(--spacing) * 16);
   }
   .text-center {
     text-align: center;
@@ -2898,9 +2904,8 @@
   .opacity-70 {
     opacity: 70%;
   }
-  .shadow {
-    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  .opacity-80 {
+    opacity: 80%;
   }
   .shadow-2xl {
     --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
@@ -2975,30 +2980,6 @@
       --fontsize: 0.75rem;
       --btn-p: 0.75rem;
       --size: calc(var(--size-field, 0.25rem) * 8);
-    }
-  }
-  @layer daisyui.l1.l2 {
-    .badge-accent {
-      --badge-color: var(--color-accent);
-      --badge-fg: var(--color-accent-content);
-    }
-  }
-  @layer daisyui.l1.l2 {
-    .badge-error {
-      --badge-color: var(--color-error);
-      --badge-fg: var(--color-error-content);
-    }
-  }
-  @layer daisyui.l1.l2 {
-    .badge-primary {
-      --badge-color: var(--color-primary);
-      --badge-fg: var(--color-primary-content);
-    }
-  }
-  @layer daisyui.l1.l2 {
-    .badge-secondary {
-      --badge-color: var(--color-secondary);
-      --badge-fg: var(--color-secondary-content);
     }
   }
   @layer daisyui.l1.l2.l3 {
@@ -3283,6 +3264,44 @@
       box-shadow: 0 0.75rem 2rem color-mix(in oklab, var(--color-neutral) 8%, transparent);
     }
   }
+  [data-theme="dracula"] .app-panel {
+    border-color: var(--color-base-300);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    [data-theme="dracula"] .app-panel {
+      border-color: color-mix(in oklab, var(--color-base-300) 48%, transparent);
+    }
+  }
+  [data-theme="dracula"] .app-panel {
+    background: var(--color-base-100);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    [data-theme="dracula"] .app-panel {
+      background: color-mix(in oklab, var(--color-base-100) 82%, var(--color-base-200));
+    }
+  }
+  [data-theme="dracula"] .app-panel {
+    box-shadow: none;
+  }
+  [data-theme="dracula"] .app-panel-soft {
+    border-color: var(--color-base-300);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    [data-theme="dracula"] .app-panel-soft {
+      border-color: color-mix(in oklab, var(--color-base-300) 42%, transparent);
+    }
+  }
+  [data-theme="dracula"] .app-panel-soft {
+    background: var(--color-base-100);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    [data-theme="dracula"] .app-panel-soft {
+      background: color-mix(in oklab, var(--color-base-100) 72%, var(--color-base-200));
+    }
+  }
+  [data-theme="dracula"] .app-panel-soft {
+    box-shadow: none;
+  }
   .app-kicker {
     border-color: var(--color-primary);
   }
@@ -3405,16 +3424,39 @@
     color: var(--color-base-content);
   }
   .link-card {
-    min-height: 11rem;
+    min-height: 8.5rem;
   }
   .link-card-surface {
-    height: 11rem;
+    height: 8.5rem;
   }
   .link-card-title {
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+  }
+  .link-card-main {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    left: 1rem;
+    transform: translateY(-50%);
+  }
+  .link-card-category {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    max-width: min(9rem, calc(100% - 1.5rem));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .link-card-actions .tooltip:before {
+    max-width: min(20rem, calc(100vw - 2rem));
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    line-height: 1.35;
   }
   .link-pill-category {
     border-color: var(--color-primary);

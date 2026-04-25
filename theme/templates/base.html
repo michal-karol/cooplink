@@ -77,15 +77,43 @@
                             </svg>
                         </label>
                         <ul tabindex="0" class="menu dropdown-content mt-3 z-[1100] w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
-                            <li><a href="{% url 'links:dashboard' %}">Dashboard</a></li>
-                            <li><a href="{% url 'links:library' %}">Library</a></li>
-                            <li><a href="{% url 'links:shared_dashboard' %}">Shared</a></li>
-                            <li><a href="{% url 'links:categories' %}">Categories</a></li>
-                            <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li>
+                                <a href="{% url 'links:dashboard' %}">
+                                    <i class="fa-solid fa-table-columns w-4" aria-hidden="true"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'links:library' %}">
+                                    <i class="fa-solid fa-bookmark w-4" aria-hidden="true"></i>
+                                    <span>Library</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'links:shared_dashboard' %}">
+                                    <i class="fa-solid fa-share-nodes w-4" aria-hidden="true"></i>
+                                    <span>Shared</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'links:categories' %}">
+                                    <i class="fa-solid fa-layer-group w-4" aria-hidden="true"></i>
+                                    <span>Categories</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'accounts:profile' %}">
+                                    <i class="fa-solid fa-user w-4" aria-hidden="true"></i>
+                                    <span>Profile</span>
+                                </a>
+                            </li>
                             <li>
                                 <form method="post" action="{% url 'accounts:logout' %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="w-full text-left">Logout</button>
+                                    <button type="submit" class="flex w-full items-center gap-2 text-left">
+                                        <i class="fa-solid fa-right-from-bracket w-4" aria-hidden="true"></i>
+                                        <span>Logout</span>
+                                    </button>
                                 </form>
                             </li>
                         </ul>
@@ -93,10 +121,22 @@
                 </div>
 
                 <div class="hidden lg:flex lg:flex-none lg:items-center lg:gap-2">
-                    <a href="{% url 'links:dashboard' %}" class="btn btn-ghost">Dashboard</a>
-                    <a href="{% url 'links:library' %}" class="btn btn-ghost">Library</a>
-                    <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost">Shared</a>
-                    <a href="{% url 'links:categories' %}" class="btn btn-ghost">Categories</a>
+                    <a href="{% url 'links:dashboard' %}" class="btn btn-ghost gap-2">
+                        <i class="fa-solid fa-table-columns text-sm opacity-80" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{% url 'links:library' %}" class="btn btn-ghost gap-2">
+                        <i class="fa-solid fa-bookmark text-sm opacity-80" aria-hidden="true"></i>
+                        <span>Library</span>
+                    </a>
+                    <a href="{% url 'links:shared_dashboard' %}" class="btn btn-ghost gap-2">
+                        <i class="fa-solid fa-share-nodes text-sm opacity-80" aria-hidden="true"></i>
+                        <span>Shared</span>
+                    </a>
+                    <a href="{% url 'links:categories' %}" class="btn btn-ghost gap-2">
+                        <i class="fa-solid fa-layer-group text-sm opacity-80" aria-hidden="true"></i>
+                        <span>Categories</span>
+                    </a>
                     <div class="mx-1 h-6 w-px bg-base-300"></div>
                     <div class="dropdown dropdown-end">
                         <label tabindex="0" class="btn btn-ghost gap-2 px-2" aria-label="User menu">

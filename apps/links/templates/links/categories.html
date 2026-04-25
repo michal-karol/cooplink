@@ -4,10 +4,10 @@
 
 {% block content %}
 <div class="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-    <section class="card bg-base-100 shadow-xl border border-base-200">
+    <section class="card app-panel">
         <div class="card-body">
             <div>
-                <div class="badge badge-primary badge-outline mb-3">Categories</div>
+                <div class="app-kicker badge mb-3">Categories</div>
                 <h1 class="card-title text-2xl">Create a category</h1>
                 <p class="text-base-content/70">Use categories to organise links in a consistent way.</p>
             </div>
@@ -32,17 +32,17 @@
         </div>
     </section>
 
-    <section class="card bg-base-100 shadow-xl border border-base-200">
+    <section class="card app-panel">
         <div class="card-body">
             <div class="flex items-center justify-between">
                 <h2 class="card-title">Existing categories</h2>
-                <div class="badge badge-outline">{{ categories|length }}</div>
+                <div class="badge link-pill-private">{{ categories|length }}</div>
             </div>
 
             {% if categories %}
                 <div class="grid gap-3 sm:grid-cols-2">
                     {% for category in categories %}
-                        <div class="border border-base-300 rounded-xl p-4 bg-base-50">
+                        <div class="app-muted-surface rounded-xl p-4">
                             <p class="font-semibold">{{ category.name }}</p>
                         </div>
                     {% endfor %}

@@ -6,7 +6,7 @@
     <textarea
         name="{{ field_name }}"
         id="{{ field_id }}"
-        class="textarea textarea-bordered w-full"
+        class="textarea textarea-bordered bg-base-100/70 w-full"
         rows="{{ rows|default:'4' }}"
         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
     >{{ value|default:'' }}</textarea>
