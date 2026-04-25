@@ -1,33 +1,24 @@
 # CoopLink
 
-CoopLink is a Django app for collecting, organizing, and sharing useful links. Users can keep a private library, pin important items to a dashboard, and publish selected links to a shared feed for other users.
+[![Python](https://img.shields.io/badge/Python-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-forestgreen)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-teal)](https://tailwindcss.com/)
+[![DaisyUI](https://img.shields.io/badge/DaisyUI-purple)](https://daisyui.com/)
+[![Docker](https://img.shields.io/badge/Docker-steelblue)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-blue)](https://kubernetes.io/)
 
-## Features
+CoopLink is a Django app for collecting, organising, and sharing useful links. Users can keep a private library, pin links for quicker access to a dashboard, and publish selected links to a shared feed for other users.
 
-- User registration and login
-- Optional email OTP during sign-up and login
-- Cloudflare Turnstile on registration and password login
-- Password reset by email
-- Personal link library with search and category filtering
-- Shared dashboard for public links
-- Pin and unpin actions for quick access
-- Category management
-- Django admin for internal management
+### Homepage
 
-## Stack
-
-- Python 3.12
-- Django 6
-- PostgreSQL 17
-- Tailwind CSS 4
-- DaisyUI 5
-- Docker Compose
+![CoopLink Homepage](docs/images/homepage.png)
 
 ## Prerequisites
 
 For local development without Docker:
 
-- Python 3.12
+- Python 
 - Node.js and npm
 - PostgreSQL
 
@@ -63,10 +54,9 @@ Notes:
 
 ## Local Development
 
-### 1. Clone the repository
+### 1. Access the repository
 
 ```bash
-git clone <your-repo-url>
 cd cooplink
 ```
 
@@ -85,7 +75,8 @@ cp .env.example .env
 
 Then edit `.env` and set at least:
 
-- `SECRET_KEY`
+- `SECRET_KEY`: required Django secret key. For local development, any long random string is fine. You can generate one with:
+  `python -c "import secrets; print(secrets.token_urlsafe(50))"`
 - either `DATABASE_URL` or `SQLITE_FOR_DEV=True`
 - Turnstile site and secret keys
 
@@ -202,55 +193,6 @@ Check the deployment:
 kubectl get pods
 kubectl get svc
 ```
-
-## Running Tests
-
-Run the Django test suite:
-
-```bash
-python manage.py test
-```
-
-If `TEST_DATABASE_URL` is not set, tests fall back to SQLite. CI uses PostgreSQL.
-
-## Security Checks
-
-Install the audit tool locally if needed:
-
-```bash
-python -m pip install pip-audit
-```
-
-Run the dependency vulnerability scan:
-
-```bash
-pip-audit -r requirements.txt
-```
-
-Check for outdated packages:
-
-```bash
-pip list --outdated
-```
-
-Note:
-
-- `pip-audit -r requirements.txt` fails when known vulnerabilities are found
-- `pip list --outdated` is informational and helps plan upgrades
-
-## CI
-
-GitHub Actions runs on pushes to `main` and on pull requests. The workflow:
-
-- sets up Python 3.12
-- starts PostgreSQL 17
-- installs dependencies
-- runs migrations
-- runs the Django test suite
-
-The GitHub Actions workflow continues to use PostgreSQL explicitly; the local `SQLITE_FOR_DEV` override is not set in CI.
-
-The workflow file is at [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Project Structure
 
