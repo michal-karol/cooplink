@@ -85,6 +85,45 @@
 @source "../../../**/*.{html,py,js}";
 
 @layer components {
+  .app-panel {
+    border: 1px solid color-mix(in oklab, var(--color-base-300) 80%, transparent);
+    background: color-mix(in oklab, var(--color-base-100) 88%, transparent);
+    box-shadow: 0 1.5rem 4rem color-mix(in oklab, var(--color-neutral) 12%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .app-panel-soft {
+    border: 1px solid color-mix(in oklab, var(--color-base-300) 80%, transparent);
+    background: color-mix(in oklab, var(--color-base-100) 76%, transparent);
+    box-shadow: 0 0.75rem 2rem color-mix(in oklab, var(--color-neutral) 8%, transparent);
+  }
+
+  .app-kicker {
+    border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    background-color: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    color: var(--color-primary);
+  }
+
+  .app-kicker-secondary {
+    border-color: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+    background-color: color-mix(in oklab, var(--color-secondary) 10%, transparent);
+    color: var(--color-secondary);
+  }
+
+  .app-card-title {
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+
+  .app-muted-surface {
+    border: 1px solid color-mix(in oklab, var(--color-base-300) 80%, transparent);
+    background: color-mix(in oklab, var(--color-base-200) 55%, transparent);
+  }
+
+  .app-auth-shell {
+    min-height: calc(100vh - 22rem);
+  }
+
   .app-shell {
     background:
       linear-gradient(135deg,
