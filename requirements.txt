@@ -8,7 +8,7 @@ cookiecutter==2.7.1
 Django==6.0.6
 django-browser-reload==1.21.0
 django-environ==0.13.0
-django-tailwind==4.4.2
+django-tailwind==4.5.0
 gunicorn==26.0.0
 honcho==2.0.0
 idna==3.18
